@@ -8,11 +8,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.pokemondex.ui.theme.Black
+import com.example.pokemondex.ui.theme.Gray
+import com.example.pokemondex.ui.theme.LightGray
 import com.example.pokemondex.ui.theme.White
 
 @Composable
 fun getWhite() : Color =
     if (isSystemInDarkTheme()) Black else White
+
+@Composable
+fun getBlack() : Color =
+    if (isSystemInDarkTheme()) White else Black
+
+@Composable
+fun getGray() : Color =
+    if (isSystemInDarkTheme()) LightGray else Gray
 
 // https://betterprogramming.pub/gridview-and-lazycolum-integration-with-jetpack-compose-e90849aeb6d3
 fun <T> LazyListScope.gridItems(

@@ -8,6 +8,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
+import com.example.pokemondex.view.add.PokemonAddContainer
 import com.example.pokemondex.view.home.HomeContainer
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -34,6 +35,14 @@ fun NavigationGraph() {
         ) {
             HomeContainer(routeAction = routAction)
         }
+        /** 포켓몬 추가 화면 **/
+        composable(
+            route = RouteAction.Add,
+            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
+            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            PokemonAddContainer(routeAction = routAction)
+        }
     }
 
 }
@@ -44,6 +53,10 @@ class RouteAction(private val navController: NavController) {
         navController.navigate("$Detail/group")
     }
 
+    fun navToAdd() {
+        navController.navigate(Add)
+    }
+
     fun popupBackStack() {
         navController.popBackStack()
     }
@@ -51,6 +64,7 @@ class RouteAction(private val navController: NavController) {
     companion object {
         const val Home = "home"
         const val Detail = "detail"
+        const val Add = "add"
     }
 
 }

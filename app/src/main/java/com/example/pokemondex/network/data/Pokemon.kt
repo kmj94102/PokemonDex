@@ -1,18 +1,18 @@
 package com.example.pokemondex.network.data
 
 data class Pokemon(
-    val number: String?,
-    val name: String?,
-    val status: String?,
-    val classification: String?,
-    val characteristic: String?,
-    val attribute: String?,
-    val dotImage: String?,
-    val dotShinyImage: String?,
-    val image: String?,
-    val shinyImage: String?,
-    val description: String?,
-    val generation: Int?
+    var number: String?= null,
+    var name: String?= null,
+    var status: String?= null,
+    var classification: String?= null,
+    var characteristic: String?= null,
+    var attribute: String?= null,
+    var dotImage: String?= null,
+    var dotShinyImage: String?= null,
+    var image: String?= null,
+    var shinyImage: String?= null,
+    var description: String?= null,
+    var generation: Int?= null
 ) {
     fun itemMapper() : PokemonItem? {
         return PokemonItem(
@@ -45,4 +45,9 @@ data class PokemonItem(
     val shinyImage: String,
     val description: String,
     val generation: Int
+)
+
+data class PokemonStatusInfo(
+    val name: String,
+    var value: Int
 )
