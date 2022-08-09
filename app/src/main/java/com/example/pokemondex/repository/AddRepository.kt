@@ -3,6 +3,7 @@ package com.example.pokemondex.repository
 import com.example.pokemondex.network.NetworkClient
 import com.example.pokemondex.network.data.Characteristic
 import com.example.pokemondex.network.data.Pokemon
+import com.example.pokemondex.network.data.PokemonListItem
 import javax.inject.Inject
 
 class AddRepository @Inject constructor(

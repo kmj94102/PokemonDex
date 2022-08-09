@@ -33,18 +33,41 @@ data class Pokemon(
 }
 
 data class PokemonItem(
+    val number: String = "",
+    val name: String = "",
+    val status: String = "",
+    val classification: String = "",
+    val characteristic: String = "",
+    val attribute: String = "",
+    val dotImage: String = "",
+    val dotShinyImage: String = "",
+    val image: String = "",
+    val shinyImage: String = "",
+    val description: String = "",
+    val generation: Int = 0
+)
+
+data class PokemonListItemTemp(
+    val number: String?= null,
+    val name: String?= null,
+    val dotImage: String?= null,
+    val dotShinyImage: String?= null,
+) {
+    fun mapper(): PokemonListItem? {
+        return PokemonListItem(
+            number = number ?: return null,
+            name = name ?: return null,
+            dotImage = dotImage ?: return null,
+            dotShinyImage = dotShinyImage ?: return null
+        )
+    }
+}
+
+data class PokemonListItem(
     val number: String,
     val name: String,
-    val status: String,
-    val classification: String,
-    val characteristic: String,
-    val attribute: String,
     val dotImage: String,
     val dotShinyImage: String,
-    val image: String,
-    val shinyImage: String,
-    val description: String,
-    val generation: Int
 )
 
 data class PokemonStatusInfo(

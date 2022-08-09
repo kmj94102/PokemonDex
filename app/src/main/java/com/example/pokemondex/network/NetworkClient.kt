@@ -2,6 +2,7 @@ package com.example.pokemondex.network
 
 import com.example.pokemondex.network.data.Characteristic
 import com.example.pokemondex.network.data.Pokemon
+import com.example.pokemondex.network.data.PokemonListItemTemp
 import javax.inject.Inject
 
 class NetworkClient @Inject constructor(
@@ -25,6 +26,27 @@ class NetworkClient @Inject constructor(
         failureListener: () -> Unit
     ) = try {
         successListener(service.insertCharacteristic(characteristic))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun selectPokemonList(
+        successListener: (List<PokemonListItemTemp>) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.getPokemonList())
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun selectPokemon(
+        number: String,
+        successListener: (Pokemon) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.getPokemon(number))
     } catch (e: Exception) {
         e.printStackTrace()
         failureListener()

@@ -46,7 +46,9 @@ fun HomeContainer(routeAction: RouteAction) {
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.padding(horizontal = 16.dp)
         ) { itemData ->
-            HomeCardButton(itemData)
+            HomeCardButton(itemData) {
+                routeAction.navToList(it)
+            }
         }
 
         item {
@@ -59,7 +61,11 @@ fun HomeContainer(routeAction: RouteAction) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeCardButton(data: String, modifier: Modifier = Modifier) {
+fun HomeCardButton(
+    data: String,
+    modifier: Modifier = Modifier,
+    clickListener: (String) -> Unit
+) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = getWhite(),
@@ -68,7 +74,7 @@ fun HomeCardButton(data: String, modifier: Modifier = Modifier) {
             defaultElevation = 10.dp
         ),
         onClick = {
-
+            clickListener(data)
         },
         modifier = modifier
             .fillMaxWidth()
