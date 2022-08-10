@@ -11,8 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,9 +29,9 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.*
-import com.example.pokemondex.util.getBlack
-import com.example.pokemondex.util.getGray
-import com.example.pokemondex.util.gridItems
+import com.example.pokemondex.util.*
+import com.example.pokemondex.view.dialog.RegisterResultDialog
+import com.example.pokemondex.view.dialog.SearchIndexDialog
 import com.example.pokemondex.view.navigation.RouteAction
 
 @Composable
@@ -51,6 +50,10 @@ fun PokemonAddContainer(
             }
         }
         .build()
+    val loadingDialogState = remember { mutableStateOf(false) }
+    val searchDialogState = remember { mutableStateOf(false) }
+    val resultDialogState = remember { mutableStateOf(false) }
+    val resultState = remember { mutableStateOf("") }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
 
@@ -68,7 +71,7 @@ fun PokemonAddContainer(
                     contentDescription = "prev",
                     colorFilter = ColorFilter.tint(getBlack()),
                     modifier = Modifier
-                        .clickable {
+                        .nonRippleClickable {
                             routeAction.popupBackStack()
                         }
                 )
@@ -78,6 +81,16 @@ fun PokemonAddContainer(
                     textAlign = TextAlign.Center,
                     color = MainColor,
                     modifier = Modifier.align(Alignment.Center)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_setting),
+                    contentDescription = "setting",
+                    colorFilter = ColorFilter.tint(getBlack()),
+                    modifier = Modifier
+                        .nonRippleClickable {
+                            searchDialogState.value = true
+                        }
+                        .align(Alignment.TopEnd)
                 )
             } // Box
         } // 상단 타이틀
@@ -432,9 +445,13 @@ fun PokemonAddContainer(
                     viewModel.event(
                         AddEvent.Register(
                             successListener = {
+                                resultState.value = it
+                                resultDialogState.value = true
                                 Log.e("+++++", "success : \n$it")
                             },
                             failureListener = {
+                                resultState.value = "등록 실패"
+                                resultDialogState.value = true
                                 Log.e("+++++", "failure")
                             }
                         )
@@ -455,7 +472,28 @@ fun PokemonAddContainer(
             }
         }
 
+    } // LazyColumn
+
+    SearchIndexDialog(
+        isShow = searchDialogState,
+        okClickListener = {
+            searchDialogState.value = false
+            viewModel.event(AddEvent.SearchPokemonInfo(
+                index = it,
+                failureListener = { msg ->
+                    context.toast(msg)
+                }
+            ))
+        }
+    )
+
+    RegisterResultDialog(
+        result = resultState.value,
+        isShow = resultDialogState
+    ) {
+        resultDialogState.value = false
     }
+
 }
 
 private fun PokemonAddViewModel.textFieldChange(type: String, value: String) {

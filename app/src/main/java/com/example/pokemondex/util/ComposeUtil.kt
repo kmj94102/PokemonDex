@@ -1,9 +1,12 @@
 package com.example.pokemondex.util
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -23,6 +26,16 @@ fun getBlack() : Color =
 @Composable
 fun getGray() : Color =
     if (isSystemInDarkTheme()) LightGray else Gray
+
+@Composable
+fun Modifier.nonRippleClickable(
+    onClick: () -> Unit
+) = clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() }
+    ) {
+        onClick()
+    }
 
 // https://betterprogramming.pub/gridview-and-lazycolum-integration-with-jetpack-compose-e90849aeb6d3
 fun <T> LazyListScope.gridItems(

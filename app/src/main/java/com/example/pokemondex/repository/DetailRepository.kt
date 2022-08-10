@@ -1,11 +1,11 @@
 package com.example.pokemondex.repository
 
-import com.example.pokemondex.network.NetworkClient
+import com.example.pokemondex.network.PokemonClient
 import com.example.pokemondex.network.data.PokemonItem
 import javax.inject.Inject
 
 class DetailRepository @Inject constructor(
-    private val client: NetworkClient
+    private val client: PokemonClient
 ) {
 
     suspend fun getPokemonInfo(

@@ -1,13 +1,13 @@
 package com.example.pokemondex.repository
 
-import com.example.pokemondex.network.NetworkClient
-import com.example.pokemondex.network.data.Characteristic
-import com.example.pokemondex.network.data.Pokemon
-import com.example.pokemondex.network.data.PokemonListItem
+import com.example.pokemondex.network.ExternalClient
+import com.example.pokemondex.network.PokemonClient
+import com.example.pokemondex.network.data.*
 import javax.inject.Inject
 
 class AddRepository @Inject constructor(
-    private val client: NetworkClient
+    private val client: PokemonClient,
+    private val externalClient: ExternalClient
 ) {
 
     suspend fun insertPokemon(
@@ -32,6 +32,33 @@ class AddRepository @Inject constructor(
             successListener = successListener,
             failureListener = failureListener
         )
+    }
+
+    suspend fun getPokemonInfo(
+        index: Int,
+        successListener: (PokemonInfoResult, SpeciesInfoResult) -> Unit,
+        failureListener: () -> Unit
+    ) {
+        var info = PokemonInfoResult(mapOf(), listOf())
+        var speciesInfo = SpeciesInfoResult("","","")
+        externalClient.getPokemonInfo(
+            index = index,
+            successListener = {
+                info = it.mapper()
+            },
+            failureListener = failureListener
+        )
+
+        externalClient.getPokemonSpeciesInfo(
+            index = index,
+            successListener = {
+                it.mapper()
+                    ?.let { result -> speciesInfo = result }
+                    ?: failureListener()
+            },
+            failureListener = failureListener
+        )
+        successListener(info, speciesInfo)
     }
 
 }

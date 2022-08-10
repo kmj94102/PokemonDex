@@ -12,6 +12,7 @@ val Pink40 = Color(0xFF7D5260)
 
 val MainColor = Color(0xFFED6035)
 val Black = Color(0xFF17181D)
+val DarkDialogBackground = Color(0xFF363636)
 val White = Color(0xFFE9E9E9)
 val LightGray = Color(0xFFC8C8C8)
 val Gray = Color(0xFF9E9E9E)

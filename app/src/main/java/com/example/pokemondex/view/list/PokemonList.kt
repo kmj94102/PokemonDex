@@ -30,6 +30,7 @@ import com.example.pokemondex.network.data.PokemonListItem
 import com.example.pokemondex.ui.theme.*
 import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.gridItems
+import com.example.pokemondex.util.nonRippleClickable
 import com.example.pokemondex.view.navigation.RouteAction
 
 @Composable
@@ -59,7 +60,7 @@ fun PokemonListContainer(
                 colorFilter = ColorFilter.tint(getBlack()),
                 modifier = Modifier
                     .padding(all = 17.dp)
-                    .clickable { routeAction.popupBackStack() }
+                    .nonRippleClickable { routeAction.popupBackStack() }
             )
             Image(
                 painter = painterResource(id = R.drawable.ic_menu),
@@ -67,7 +68,7 @@ fun PokemonListContainer(
                 colorFilter = ColorFilter.tint(getBlack()),
                 modifier = Modifier
                     .padding(top = 17.dp, end = 24.dp)
-                    .clickable {
+                    .nonRippleClickable {
                         viewModel.event(ListEvent.ImageStateChange)
                     }
             )

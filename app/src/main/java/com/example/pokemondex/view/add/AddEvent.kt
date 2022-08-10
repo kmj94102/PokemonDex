@@ -21,4 +21,8 @@ sealed class AddEvent{
         val successListener: (String) -> Unit,
         val failureListener: () -> Unit
     ): AddEvent()
+    data class SearchPokemonInfo(
+        val index: String,
+        val failureListener: (String) -> Unit
+    ): AddEvent()
 }

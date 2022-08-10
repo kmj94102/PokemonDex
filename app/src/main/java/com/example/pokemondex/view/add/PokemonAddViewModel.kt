@@ -8,8 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.pokemondex.network.data.Characteristic
 import com.example.pokemondex.network.data.Pokemon
 import com.example.pokemondex.network.data.PokemonStatusInfo
+import com.example.pokemondex.network.data.StatusInfo
 import com.example.pokemondex.repository.AddRepository
-import com.example.pokemondex.util.toIntOrZero
+import com.example.pokemondex.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,12 +30,12 @@ class PokemonAddViewModel @Inject constructor(
     val typeList: List<String> = _typeList
 
     private val _statusList = mutableStateListOf(
-        PokemonStatusInfo(Hp, 0),
-        PokemonStatusInfo(Attack, 0),
-        PokemonStatusInfo(Defence, 0),
-        PokemonStatusInfo(SpecialAttack, 0),
-        PokemonStatusInfo(SpecialDefence, 0),
-        PokemonStatusInfo(Speed, 0),
+        PokemonStatusInfo(StatusInfo.HP.koreanName, 0),
+        PokemonStatusInfo(StatusInfo.ATTACK.koreanName, 0),
+        PokemonStatusInfo(StatusInfo.DEFENSE.koreanName, 0),
+        PokemonStatusInfo(StatusInfo.SPECIAL_ATTACK.koreanName, 0),
+        PokemonStatusInfo(StatusInfo.SPECIAL_DEFENSE.koreanName, 0),
+        PokemonStatusInfo(StatusInfo.SPEED.koreanName, 0),
     )
     val statusList: List<PokemonStatusInfo> = _statusList
 
@@ -78,6 +79,12 @@ class PokemonAddViewModel @Inject constructor(
                     failureListener = event.failureListener
                 )
             }
+            is AddEvent.SearchPokemonInfo -> {
+                searchPokemonInfo(
+                    index = event.index,
+                    failureListener = event.failureListener
+                )
+            }
         }
     }
 
@@ -99,22 +106,22 @@ class PokemonAddViewModel @Inject constructor(
                 _pokemonState.value =
                     _pokemonState.value.copy(generation = event.value.toIntOrNull())
             }
-            Hp -> {
+            StatusInfo.HP.originalName -> {
                 _statusList[0] = _statusList[0].copy(value = event.value.toIntOrZero())
             }
-            Attack -> {
+            StatusInfo.ATTACK.originalName -> {
                 _statusList[1] = _statusList[1].copy(value = event.value.toIntOrZero())
             }
-            Defence -> {
+            StatusInfo.DEFENSE.originalName -> {
                 _statusList[2] = _statusList[2].copy(value = event.value.toIntOrZero())
             }
-            SpecialAttack -> {
+            StatusInfo.SPECIAL_ATTACK.originalName -> {
                 _statusList[3] = _statusList[3].copy(value = event.value.toIntOrZero())
             }
-            SpecialDefence -> {
+            StatusInfo.SPECIAL_DEFENSE.originalName -> {
                 _statusList[4] = _statusList[4].copy(value = event.value.toIntOrZero())
             }
-            Speed -> {
+            StatusInfo.SPEED.originalName -> {
                 _statusList[5] = _statusList[5].copy(value = event.value.toIntOrZero())
             }
             Image -> {
@@ -131,6 +138,38 @@ class PokemonAddViewModel @Inject constructor(
             }
             else -> {}
         }
+    }
+
+    private fun searchPokemonInfo(
+        index: String,
+        failureListener: (String) -> Unit
+    ) = viewModelScope.launch {
+        repository.getPokemonInfo(
+            index = index.toIntOrZero(),
+            successListener = { infoResult, speciesInfo ->
+                initSettings()
+
+                infoResult.typeList.forEachIndexed { index, type ->
+                    _typeList[index] = type
+                }
+
+                setStatus(infoResult.status)
+
+                _pokemonState.value = _pokemonState.value.copy(
+                    number = index.padStart(4, '0'),
+                    name = speciesInfo.name,
+                    description = speciesInfo.description,
+                    classification = speciesInfo.classification,
+                    image = getPokemonImage(index.toIntOrZero()),
+                    shinyImage = getPokemonShinyImage(index.toIntOrZero()),
+                    dotImage = getPokemonDotImage(index.toIntOrZero()),
+                    dotShinyImage = getPokemonDotShinyImage(index.toIntOrZero()),
+                )
+            },
+            failureListener = {
+                failureListener("조회 실패하였습니다.")
+            }
+        )
     }
 
     private fun registerPokemon(
@@ -170,7 +209,7 @@ class PokemonAddViewModel @Inject constructor(
             repository.insertCharacteristic(
                 characteristic = characteristic,
                 successListener = {
-                    result += it
+                    result += "\n$it"
                 },
                 failureListener = failureListener
             )
@@ -210,20 +249,53 @@ class PokemonAddViewModel @Inject constructor(
         ""
     }
 
+    private fun setStatus(map: Map<String, Int>) {
+        _statusList[0] = PokemonStatusInfo(
+            name = StatusInfo.HP.koreanName,
+            value = map[StatusInfo.HP.koreanName] ?: 0
+        )
+        _statusList[1] = PokemonStatusInfo(
+            name = StatusInfo.ATTACK.koreanName,
+            value = map[StatusInfo.ATTACK.koreanName] ?: 0
+        )
+        _statusList[2] = PokemonStatusInfo(
+            name = StatusInfo.DEFENSE.koreanName,
+            value = map[StatusInfo.DEFENSE.koreanName] ?: 0
+        )
+        _statusList[3] = PokemonStatusInfo(
+            name = StatusInfo.SPECIAL_ATTACK.koreanName,
+            value = map[StatusInfo.SPECIAL_ATTACK.koreanName] ?: 0
+        )
+        _statusList[4] = PokemonStatusInfo(
+            name = StatusInfo.SPECIAL_DEFENSE.koreanName,
+            value = map[StatusInfo.SPECIAL_DEFENSE.koreanName] ?: 0
+        )
+        _statusList[5] = PokemonStatusInfo(
+            name = StatusInfo.SPEED.koreanName,
+            value = map[StatusInfo.SPEED.koreanName] ?: 0
+        )
+    }
+
+    private fun initSettings() {
+        _typeList[0] = ""
+        _typeList[1] = ""
+
+        _statusList[0] = PokemonStatusInfo(StatusInfo.HP.originalName, 0)
+        _statusList[1] = PokemonStatusInfo(StatusInfo.ATTACK.originalName, 0)
+        _statusList[2] = PokemonStatusInfo(StatusInfo.DEFENSE.originalName, 0)
+        _statusList[3] = PokemonStatusInfo(StatusInfo.SPECIAL_ATTACK.originalName, 0)
+        _statusList[4] = PokemonStatusInfo(StatusInfo.SPECIAL_DEFENSE.originalName, 0)
+        _statusList[5] = PokemonStatusInfo(StatusInfo.SPEED.originalName, 0)
+
+        _pokemonState.value = Pokemon()
+    }
+
     companion object {
         const val Name = "name"
         const val Number = "number"
         const val Description = "description"
         const val Characteristic = "characteristic"
-        const val Status = "status"
-        const val Hp = "HP"
-        const val Attack = "공격"
-        const val Defence = "방어"
-        const val SpecialAttack = "특공"
-        const val SpecialDefence = "특방"
-        const val Speed = "속도"
         const val Classification = "classification"
-        const val Attribute = "attribute"
         const val DotImage = "dotImage"
         const val DotShinyImage = "DotShinyImage"
         const val Image = "image"

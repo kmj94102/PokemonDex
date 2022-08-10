@@ -1,6 +1,7 @@
 package com.example.pokemondex.di
 
 import com.example.pokemondex.BuildConfig
+import com.example.pokemondex.network.ExternalService
 import com.example.pokemondex.network.PokemonService
 import com.example.pokemondex.util.Constants
 import dagger.Module
@@ -12,6 +13,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -47,6 +49,7 @@ class RetrofitUtil {
 
     @Provides
     @Singleton
+    @Named("main")
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
         gsonConverterFactory: GsonConverterFactory
@@ -60,8 +63,28 @@ class RetrofitUtil {
     @Provides
     @Singleton
     fun providePokemonService(
-        retrofit: Retrofit
+        @Named("main") retrofit: Retrofit
     ) : PokemonService =
         retrofit.create(PokemonService::class.java)
+
+    @Provides
+    @Singleton
+    @Named("sub")
+    fun provideSubRetrofit(
+        okHttpClient: OkHttpClient,
+        gsonConverterFactory: GsonConverterFactory
+    ) : Retrofit =
+        Retrofit.Builder()
+            .baseUrl(Constants.ExternalUrl)
+            .client(okHttpClient)
+            .addConverterFactory(gsonConverterFactory)
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideExternalService(
+        @Named("sub") retrofit: Retrofit
+    ) : ExternalService =
+        retrofit.create(ExternalService::class.java)
 
 }

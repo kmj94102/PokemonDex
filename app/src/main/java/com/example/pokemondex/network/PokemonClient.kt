@@ -5,7 +5,7 @@ import com.example.pokemondex.network.data.Pokemon
 import com.example.pokemondex.network.data.PokemonListItemTemp
 import javax.inject.Inject
 
-class NetworkClient @Inject constructor(
+class PokemonClient @Inject constructor(
     private val service: PokemonService
 ){
 
