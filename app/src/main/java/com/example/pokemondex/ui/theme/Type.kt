@@ -12,24 +12,24 @@ import com.example.pokemondex.R
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.yanolja_bold)),
-        fontWeight = FontWeight.Normal,
+//        fontFamily = FontFamily(Font(R.font.yanolja_bold)),
+        fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.yanolja_regular)),
+//        fontFamily = FontFamily(Font(R.font.yanolja_regular)),
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.yanolja_bold)),
-        fontWeight = FontWeight.Normal,
+//        fontFamily = FontFamily(Font(R.font.yanolja_bold)),
+        fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
-    )
+    ),
 )

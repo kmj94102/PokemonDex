@@ -3,7 +3,7 @@ package com.example.pokemondex.network.data
 import com.example.pokemondex.R
 
 enum class TypeInfo (val originalName: String, val koreanName: String, val imageRes: Int){
-    Normal("Normal", "노말", R.drawable.img_normal),
+    Normal("normal", "노말", R.drawable.img_normal),
     Fighting("fighting", "격투", R.drawable.img_fighting),
     Flying("flying", "비행", R.drawable.img_flying),
     Poison("poison", "독", R.drawable.img_poison),

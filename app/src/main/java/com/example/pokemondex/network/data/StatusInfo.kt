@@ -2,6 +2,7 @@ package com.example.pokemondex.network.data
 
 import androidx.compose.ui.graphics.Color
 
+
 enum class StatusInfo(
     val originalName: String,
     val koreanName: String,

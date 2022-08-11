@@ -67,6 +67,13 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation "com.google.accompanist:accompanist-navigation-animation:0.24.13-rc"
 
+    // compose viewpager
+    implementation "com.google.accompanist:accompanist-pager:0.20.1"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.20.1"
+
+    // compose ConstraintLayout
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha03"
+
     // retrofit - http://square.github.io/retrofit/ (Apache 2.0)
     def retrofit_version = '2.9.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

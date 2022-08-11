@@ -2,7 +2,7 @@ package com.example.pokemondex.util
 
 object Constants {
 
-    const val BaseUrl = "http://10.0.2.2:8000/"
+    const val BaseUrl = "https://4f45-121-164-144-250.ngrok.io"
     const val ExternalUrl = "https://pokeapi.co/api/"
 
 }
