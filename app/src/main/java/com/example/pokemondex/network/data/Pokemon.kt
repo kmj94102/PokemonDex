@@ -1,6 +1,34 @@
 package com.example.pokemondex.network.data
 
+data class PokemonResult(
+    val info: Pokemon,
+    val before: PokemonListItemTemp?,
+    val after: PokemonListItemTemp?
+) {
+    fun itemMapper() : PokemonItem? {
+        return PokemonItem(
+            index = info.index ?: return null,
+            number = info.number ?: return null,
+            name = info.name ?: return null,
+            status = info.status ?: return null,
+            classification = info.classification ?: return null,
+            characteristic = info.characteristic ?: return null,
+            attribute = info.attribute ?: return null,
+            dotImage = info.dotImage ?: return null,
+            dotShinyImage = info.dotShinyImage ?: return null,
+            image = info.image ?: return null,
+            shinyImage = info.shinyImage ?: return null,
+            description = info.description ?: return null,
+            generation = info.generation ?: return null,
+            before = before?.mapper(),
+            after = after?.mapper()
+        )
+    }
+}
+
+
 data class Pokemon(
+    var index: Long?= null,
     var number: String?= null,
     var name: String?= null,
     var status: String?= null,
@@ -13,26 +41,10 @@ data class Pokemon(
     var shinyImage: String?= null,
     var description: String?= null,
     var generation: Int?= null
-) {
-    fun itemMapper() : PokemonItem? {
-        return PokemonItem(
-            number = number ?: return null,
-            name = name ?: return null,
-            status = status ?: return null,
-            classification = classification ?: return null,
-            characteristic = characteristic ?: return null,
-            attribute = attribute ?: return null,
-            dotImage = dotImage ?: return null,
-            dotShinyImage = dotShinyImage ?: return null,
-            image = image ?: return null,
-            shinyImage = shinyImage ?: return null,
-            description = description ?: return null,
-            generation = generation ?: return null
-        )
-    }
-}
+)
 
 data class PokemonItem(
+    val index: Long = 0L,
     val number: String = "",
     val name: String = "",
     val status: String = "",
@@ -44,7 +56,9 @@ data class PokemonItem(
     val image: String = "",
     val shinyImage: String = "",
     val description: String = "",
-    val generation: Int = 0
+    val generation: Int = 0,
+    val before: PokemonListItem? = null,
+    val after: PokemonListItem? = null
 )
 
 data class PokemonListItemTemp(

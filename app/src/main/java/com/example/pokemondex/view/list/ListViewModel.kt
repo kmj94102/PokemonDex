@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.pokemondex.network.data.PokemonListItem
 import com.example.pokemondex.repository.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +19,9 @@ class ListViewModel @Inject constructor(
     private val repository: ListRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
+
+    private val _stateFlow = MutableStateFlow<Event>(Event.Init)
+    val stateFlow : StateFlow<Event> = _stateFlow
 
     private val _pokemonList = mutableStateListOf<PokemonListItem>()
     val pokemonList: List<PokemonListItem> = _pokemonList
@@ -38,6 +43,7 @@ class ListViewModel @Inject constructor(
                         _pokemonList.isEmpty()
                     }
                 )
+                _stateFlow.emit(Event.Complete)
             }
         }
     }
@@ -51,7 +57,11 @@ class ListViewModel @Inject constructor(
                 _imageState.value = _imageState.value.not()
             }
         }
+    }
 
+    sealed class Event {
+        object Init: Event()
+        object Complete: Event()
     }
 
 }

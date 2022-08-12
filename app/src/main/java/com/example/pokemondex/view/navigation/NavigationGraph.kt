@@ -79,8 +79,12 @@ class RouteAction(private val navController: NavController) {
         navController.navigate("$List/$group")
     }
 
-    fun navToDetail(number: String) {
-        navController.navigate("$Detail/$number")
+    fun navToDetail(number: String, needPopupBackStack: Boolean = false) {
+        navController.navigate("$Detail/$number") {
+            if (needPopupBackStack) {
+                popupBackStack()
+            }
+        }
     }
 
     fun navToAdd() {

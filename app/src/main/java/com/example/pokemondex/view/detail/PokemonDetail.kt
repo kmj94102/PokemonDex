@@ -22,7 +22,6 @@ import com.example.pokemondex.R
 import com.example.pokemondex.network.data.PokemonItem
 import com.example.pokemondex.network.data.getTypeImage
 import com.example.pokemondex.ui.theme.Black
-import com.example.pokemondex.ui.theme.MainColor
 import com.example.pokemondex.ui.theme.Typography
 import com.example.pokemondex.util.CustomScrollableTabRow
 import com.example.pokemondex.util.getBlack
@@ -47,7 +46,7 @@ fun DetailContainer(
     val tabData = listOf(
         TabItem.Description(info),
         TabItem.Status(info.status),
-        TabItem.TypeCompatibility,
+        TabItem.TypeCompatibility(viewModel.typeCompatibility),
         TabItem.EvolutionContainer
     )
     val pagerState = rememberPagerState(initialPage = 0)
@@ -62,35 +61,43 @@ fun DetailContainer(
         val (titleRow, txtName, attributeRow, mainImage,
             isShinyButton, infoCard) = createRefs()
         /** 상단 타이틀 **/
-        Row(
+        Box(
             Modifier
                 .fillMaxWidth()
+                .height(58.dp)
                 .constrainAs(titleRow) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_prev),
-                contentDescription = "prev",
-                colorFilter = ColorFilter.tint(Black),
-                modifier = Modifier
-                    .padding(17.dp)
-                    .nonRippleClickable {
+            if (info.before != null) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_prev),
+                    contentDescription = "prev",
+                    colorFilter = ColorFilter.tint(Black),
+                    modifier = Modifier
+                        .padding(17.dp)
+                        .align(Alignment.CenterStart)
+                        .nonRippleClickable {
+                            routeAction.navToDetail(info.before.number, true)
+                        }
+                )
 
-                    }
-            )
-
-            AsyncImage(
-                model = info.dotImage,
-                contentDescription = "이미지",
-                error = painterResource(id = R.drawable.img_monsterbal),
-                placeholder = painterResource(id = R.drawable.img_monsterbal),
-                modifier = Modifier
-                    .size(42.dp)
-                    .padding(top = 8.dp)
-            )
+                AsyncImage(
+                    model = if (isShiny.value) info.before.dotShinyImage else info.before.dotImage,
+                    contentDescription = "이미지",
+                    error = painterResource(id = R.drawable.img_monsterbal),
+                    placeholder = painterResource(id = R.drawable.img_monsterbal),
+                    modifier = Modifier
+                        .padding(start = 50.dp)
+                        .align(Alignment.CenterStart)
+                        .size(42.dp)
+                        .nonRippleClickable {
+                            routeAction.navToDetail(info.before.number, true)
+                        }
+                )
+            }
 
             Text(
                 text = "#${info.number}",
@@ -99,30 +106,36 @@ fun DetailContainer(
                 color = Black,
                 fontSize = 24.sp,
                 modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
+                    .align(Alignment.Center)
             )
 
-            AsyncImage(
-                model = info.dotShinyImage,
-                contentDescription = "이미지",
-                error = painterResource(id = R.drawable.img_monsterbal),
-                placeholder = painterResource(id = R.drawable.img_monsterbal),
-                modifier = Modifier
-                    .size(42.dp)
-                    .padding(top = 8.dp)
-            )
+            if (info.after != null) {
+                AsyncImage(
+                    model = if (isShiny.value) info.after.dotShinyImage else info.after.dotImage,
+                    contentDescription = "이미지",
+                    error = painterResource(id = R.drawable.img_monsterbal),
+                    placeholder = painterResource(id = R.drawable.img_monsterbal),
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(top = 8.dp, end = 50.dp)
+                        .size(42.dp)
+                        .nonRippleClickable {
+                            routeAction.navToDetail(info.after.number, true)
+                        }
+                )
 
-            Image(
-                painter = painterResource(id = R.drawable.ic_next),
-                contentDescription = "next",
-                colorFilter = ColorFilter.tint(Black),
-                modifier = Modifier
-                    .padding(17.dp)
-                    .nonRippleClickable {
-
-                    }
-            )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_next),
+                    contentDescription = "next",
+                    colorFilter = ColorFilter.tint(Black),
+                    modifier = Modifier
+                        .padding(17.dp)
+                        .align(Alignment.CenterEnd)
+                        .nonRippleClickable {
+                            routeAction.navToDetail(info.after.number, true)
+                        }
+                )
+            }
         } // 상단 타이틀
 
         /** 이름 **/
@@ -248,10 +261,13 @@ sealed class TabItem(val name: String, val screenToLoad: @Composable () -> Unit)
         }
     )
 
-    object TypeCompatibility : TabItem(
+    data class TypeCompatibility(
+        val list: List<Pair<Float, String>>
+    ) : TabItem(
         name = "상성",
         screenToLoad = {
             TypeCompatibilityContainer(
+                list = list,
                 modifier = Modifier.fillMaxSize()
             )
         }

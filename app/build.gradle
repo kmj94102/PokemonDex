@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.pokemondex"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -74,6 +74,9 @@ dependencies {
     // compose ConstraintLayout
     implementation "androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha03"
 
+    // compose flow
+    implementation "com.google.accompanist:accompanist-flowlayout:0.26.1-alpha"
+
     // retrofit - http://square.github.io/retrofit/ (Apache 2.0)
     def retrofit_version = '2.9.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -91,5 +94,10 @@ dependencies {
     // Coil
     implementation "io.coil-kt:coil-compose:2.1.0"
     implementation "io.coil-kt:coil-gif:2.1.0"
+
+    // Lottie
+    def lottie_version = '5.2.0'
+    implementation "com.airbnb.android:lottie:$lottie_version"
+    implementation "com.airbnb.android:lottie-compose:$lottie_version"
 
 }

@@ -3,6 +3,7 @@ package com.example.pokemondex.network
 import com.example.pokemondex.network.data.Characteristic
 import com.example.pokemondex.network.data.Pokemon
 import com.example.pokemondex.network.data.PokemonListItemTemp
+import com.example.pokemondex.network.data.PokemonResult
 import retrofit2.http.*
 
 interface PokemonService {
@@ -11,7 +12,7 @@ interface PokemonService {
     suspend fun getPokemonList(): List<PokemonListItemTemp>
 
     @GET("pokemon/number/{number}")
-    suspend fun getPokemon(@Path("number") number: String): Pokemon
+    suspend fun getPokemon(@Path("number") number: String): PokemonResult
 
     @POST("pokemon")
     suspend fun insertPokemonInfo(@Body pokemon: Pokemon): String

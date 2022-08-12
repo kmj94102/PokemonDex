@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,7 @@ import com.example.pokemondex.ui.theme.*
 import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.gridItems
 import com.example.pokemondex.util.nonRippleClickable
+import com.example.pokemondex.view.dialog.LoadingDialog
 import com.example.pokemondex.view.navigation.RouteAction
 
 @Composable
@@ -40,6 +43,9 @@ fun PokemonListContainer(
 ) {
 
     val focusManager = LocalFocusManager.current
+    val loadingState = remember { mutableStateOf(true) }
+
+    val state = viewModel.stateFlow.collectAsState()
 
     Column(
         modifier = Modifier
@@ -96,6 +102,18 @@ fun PokemonListContainer(
                 )
             }
         }
+
+        when (state.value) {
+            ListViewModel.Event.Init -> {
+                loadingState.value = true
+            }
+            ListViewModel.Event.Complete -> {
+                loadingState.value = false
+            }
+        }
+
+        LoadingDialog(loadingState)
+
     }
 }
 

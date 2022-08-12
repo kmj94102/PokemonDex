@@ -3,6 +3,7 @@ package com.example.pokemondex.network
 import com.example.pokemondex.network.data.Characteristic
 import com.example.pokemondex.network.data.Pokemon
 import com.example.pokemondex.network.data.PokemonListItemTemp
+import com.example.pokemondex.network.data.PokemonResult
 import javax.inject.Inject
 
 class PokemonClient @Inject constructor(
@@ -43,7 +44,7 @@ class PokemonClient @Inject constructor(
 
     suspend fun selectPokemon(
         number: String,
-        successListener: (Pokemon) -> Unit,
+        successListener: (PokemonResult) -> Unit,
         failureListener: () -> Unit
     ) = try {
         successListener(service.getPokemon(number))

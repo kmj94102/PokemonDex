@@ -3,13 +3,14 @@ package com.example.pokemondex.view.detail
 import android.os.Build
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,10 +29,12 @@ import coil.decode.ImageDecoderDecoder
 import com.example.pokemondex.R
 import com.example.pokemondex.network.data.PokemonItem
 import com.example.pokemondex.network.data.StatusInfo
+import com.example.pokemondex.network.data.getTypeImage
 import com.example.pokemondex.ui.theme.MainColor
 import com.example.pokemondex.ui.theme.Typography
 import com.example.pokemondex.ui.theme.White
 import com.example.pokemondex.util.*
+import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
 fun DescriptionContainer(
@@ -196,18 +199,90 @@ fun CustomProgressBar(
 }
 
 @Composable
-fun TypeCompatibilityContainer(modifier: Modifier = Modifier) =
+fun TypeCompatibilityContainer(
+    list: List<Pair<Float, String>>,
+    modifier: Modifier = Modifier
+) {
+
+    val quadrupleDamageList = list.filter { it.first == 4.0f }.map { it.second }
+    val doubleDamageList = list.filter { it.first == 2.0f }.map { it.second }
+    val damageList = list.filter { it.first == 1.0f }.map { it.second }
+    val halfDamageList = list.filter { it.first == 0.5f }.map { it.second }
+    val oneQuarterDamageList = list.filter { it.first == 0.25f }.map { it.second }
+    val zeroDamageList = list.filter { it.first == 0f }.map { it.second }
+
     LazyColumn(
         modifier = modifier
+            .padding(horizontal = 24.dp)
     ) {
-        item {
-            Text(
-                text = "타입상성",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxSize()
-            )
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+
+        if (quadrupleDamageList.isNotEmpty()) {
+            damageItems("X 4", quadrupleDamageList)
+        }
+
+        item { Spacer(modifier = Modifier.height(15.dp)) }
+
+        if (doubleDamageList.isNotEmpty()) {
+            damageItems("X 2", doubleDamageList)
+        }
+
+        item { Spacer(modifier = Modifier.height(15.dp)) }
+
+        if (damageList.isNotEmpty()) {
+            damageItems("X 1", damageList)
+        }
+
+        item { Spacer(modifier = Modifier.height(15.dp)) }
+
+        if (halfDamageList.isNotEmpty()) {
+            damageItems("X 0.5", halfDamageList)
+        }
+
+        item { Spacer(modifier = Modifier.height(15.dp)) }
+
+        if (oneQuarterDamageList.isNotEmpty()) {
+            damageItems("X 0.25", oneQuarterDamageList)
+        }
+
+        item { Spacer(modifier = Modifier.height(15.dp)) }
+
+        if (zeroDamageList.isNotEmpty()) {
+            damageItems("X 0", zeroDamageList)
+        }
+
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+    }
+}
+
+private fun LazyListScope.damageItems(
+    text: String,
+    list: List<String>
+){
+    item {
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            style = Typography.bodyLarge,
+        )
+    }
+
+    item {
+        FlowRow(
+            mainAxisSpacing = 5.dp,
+            crossAxisSpacing = 10.dp
+        ) {
+            list.forEach {
+                Image(
+                    painter = painterResource(id = getTypeImage(it)),
+                    contentDescription = "Type Icon",
+                    modifier = Modifier.size(54.dp)
+                )
+            }
         }
     }
+
+}
 
 @Composable
 fun EvolutionContainer(modifier: Modifier = Modifier) {
