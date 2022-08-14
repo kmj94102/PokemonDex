@@ -39,7 +39,7 @@ class AddRepository @Inject constructor(
         successListener: (PokemonInfoResult, SpeciesInfoResult) -> Unit,
         failureListener: () -> Unit
     ) {
-        var info = PokemonInfoResult(mapOf(), listOf())
+        var info = PokemonInfoResult(listOf(), mapOf(), listOf())
         var speciesInfo = SpeciesInfoResult("","","")
         externalClient.getPokemonInfo(
             index = index,
@@ -59,6 +59,20 @@ class AddRepository @Inject constructor(
             failureListener = failureListener
         )
         successListener(info, speciesInfo)
+    }
+
+    suspend fun getAbilityInfo(
+        name: String,
+        successListener: (AbilityInfoResult) -> Unit,
+        failureListener: () -> Unit
+    ) {
+        externalClient.getAbilityInfo(
+            name = name,
+            successListener = {
+                it.mapper()?.let(successListener)?:failureListener()
+            },
+            failureListener = failureListener
+        )
     }
 
 }

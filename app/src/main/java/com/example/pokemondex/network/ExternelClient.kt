@@ -29,4 +29,15 @@ class ExternalClient @Inject constructor(
         failureListener()
     }
 
+    suspend fun getAbilityInfo(
+        name: String,
+        successListener: (AbilityInfo) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.getAbility(name))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
 }

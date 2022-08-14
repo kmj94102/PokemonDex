@@ -3,32 +3,33 @@ package com.example.pokemondex.network.data
 import com.google.gson.annotations.SerializedName
 
 data class ExternalPokemonInfo(
+    val abilities: List<Ability>?,
     val stats: List<PokemonStatus>?,
     val types: List<PokemonType>?
+)
+
+data class Ability(
+    val ability: InfoDetail?
 )
 
 data class PokemonStatus(
     @SerializedName("base_stat")
     val baseStat: Int?,
-    val stat: StatusName?,
+    val stat: InfoDetail?,
 )
 
-data class StatusName(
+data class InfoDetail(
     val name: String?,
     val url: String?
 )
 
 data class PokemonType(
     val slot: Int?,
-    val type: TypeName?
-)
-
-data class TypeName(
-    val name: String?,
-    val url: String?
+    val type: InfoDetail?
 )
 
 data class PokemonInfoResult(
+    val abilities: List<String>,
     val status: Map<String, Int>,
     val typeList: List<String>
 )
@@ -48,8 +49,13 @@ fun PokemonType.mapper(): String? {
 
 fun ExternalPokemonInfo.mapper(): PokemonInfoResult {
 
+    val ability = mutableListOf<String>()
     val status = mutableMapOf<String, Int>()
     val typeList = mutableListOf<String>()
+
+    abilities?.mapNotNull { it.ability?.name }?.let {
+        ability.addAll(it)
+    }
 
     types?.mapNotNull { it.mapper() }?.let {
         typeList.addAll(it)
@@ -60,6 +66,7 @@ fun ExternalPokemonInfo.mapper(): PokemonInfoResult {
     }
 
     return PokemonInfoResult(
+        abilities = ability,
         status = status,
         typeList = typeList
     )
@@ -118,4 +125,33 @@ data class SpeciesInfoResult(
     val description: String,
     val classification: String,
     val name: String
+)
+
+data class AbilityInfo(
+    @SerializedName("flavor_text_entries")
+    val flavorTextEntries: List<FlavorTextEntry>,
+    val names: List<PokemonName>
+) {
+    fun mapper(): AbilityInfoResult? {
+        val description = flavorTextEntries
+            .lastOrNull { it.language.name == "ko" }
+            ?.flavorText
+            ?.replace("\n", " ")
+            ?: return null
+
+        val name = names
+            .lastOrNull { it.language.name == "ko" }
+            ?.name
+            ?: return null
+
+        return AbilityInfoResult(
+            description = description,
+            name = name
+        )
+    }
+}
+
+data class AbilityInfoResult(
+    val name: String,
+    val description: String
 )

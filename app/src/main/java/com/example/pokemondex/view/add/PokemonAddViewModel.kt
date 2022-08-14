@@ -153,6 +153,12 @@ class PokemonAddViewModel @Inject constructor(
                     _typeList[index] = type
                 }
 
+                _characteristicList.clear()
+                infoResult.abilities.forEachIndexed { index, ability ->
+                    _characteristicList.add(Characteristic())
+                    getAbility(ability, index)
+                }
+
                 setStatus(infoResult.status)
 
                 _pokemonState.value = _pokemonState.value.copy(
@@ -168,6 +174,24 @@ class PokemonAddViewModel @Inject constructor(
             },
             failureListener = {
                 failureListener("조회 실패하였습니다.")
+            }
+        )
+    }
+
+    private fun getAbility(ability: String, index: Int) = viewModelScope.launch {
+        repository.getAbilityInfo(
+            name = ability,
+            successListener = {
+                _characteristicList[index] = _characteristicList[index].copy(
+                    name = it.name,
+                    description = it.description
+                )
+            },
+            failureListener= {
+                _characteristicList[index] = _characteristicList[index].copy(
+                    name = null,
+                    description = null
+                )
             }
         )
     }
