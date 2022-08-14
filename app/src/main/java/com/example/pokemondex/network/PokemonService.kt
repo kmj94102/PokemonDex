@@ -8,8 +8,8 @@ import retrofit2.http.*
 
 interface PokemonService {
 
-    @GET("pokemons")
-    suspend fun getPokemonList(): List<PokemonListItemTemp>
+    @GET("pokemons/{generation}")
+    suspend fun getPokemonList(@Path("generation") generation: String): List<PokemonListItemTemp>
 
     @GET("pokemon/number/{number}")
     suspend fun getPokemon(@Path("number") number: String): PokemonResult

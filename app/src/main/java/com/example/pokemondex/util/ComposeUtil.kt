@@ -36,6 +36,10 @@ fun getGray() : Color =
     if (isSystemInDarkTheme()) LightGray else Gray
 
 @Composable
+fun getSkyBlue() : Color =
+    if (isSystemInDarkTheme()) Black else SkyBlue
+
+@Composable
 fun Modifier.nonRippleClickable(
     onClick: () -> Unit
 ) = clickable(

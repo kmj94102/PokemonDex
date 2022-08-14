@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.MainColor
 import com.example.pokemondex.ui.theme.Typography
+import com.example.pokemondex.util.Constants.generationList
 import com.example.pokemondex.util.getWhite
 import com.example.pokemondex.util.gridItems
 import com.example.pokemondex.view.navigation.RouteAction
@@ -22,7 +23,7 @@ import com.example.pokemondex.view.navigation.RouteAction
 @Composable
 fun HomeContainer(routeAction: RouteAction) {
 
-    val list = listOf("all", "1세대", "2세대", "3세대", "4세대", "5세대", "6세대", "7세대", "8세대", "9세대")
+    val list = generationList
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
@@ -47,7 +48,7 @@ fun HomeContainer(routeAction: RouteAction) {
             modifier = Modifier.padding(horizontal = 16.dp)
         ) { itemData ->
             HomeCardButton(itemData) {
-                routeAction.navToList(it)
+                routeAction.navToList(it.replace("세대", ""))
             }
         }
 
@@ -62,7 +63,7 @@ fun HomeContainer(routeAction: RouteAction) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeCardButton(
-    data: String,
+    data: Pair<String, Int>,
     modifier: Modifier = Modifier,
     clickListener: (String) -> Unit
 ) {
@@ -74,7 +75,7 @@ fun HomeCardButton(
             defaultElevation = 10.dp
         ),
         onClick = {
-            clickListener(data)
+            clickListener(data.first)
         },
         modifier = modifier
             .fillMaxWidth()
@@ -82,14 +83,14 @@ fun HomeCardButton(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = data,
+                text = data.first,
                 fontSize = 20.sp,
                 style = Typography.bodyLarge,
                 color = MainColor,
                 modifier = Modifier.padding(13.dp)
             )
             Image(
-                painter = painterResource(id = R.drawable.img_all_generation),
+                painter = painterResource(id = data.second),
                 contentDescription = "image",
                 modifier = Modifier
                     .width(151.dp)

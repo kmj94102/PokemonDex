@@ -9,10 +9,12 @@ class ListRepository @Inject constructor(
 ) {
 
     suspend fun selectPokemonList(
+        generation: String,
         successListener: (List<PokemonListItem>) -> Unit,
         failureListener: () -> Unit
     ) {
         client.selectPokemonList(
+            generation = generation,
             successListener = {
                 it.mapNotNull { item -> item.mapper() }.let(successListener)
             },

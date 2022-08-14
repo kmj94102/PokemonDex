@@ -33,9 +33,10 @@ class ListViewModel @Inject constructor(
     val searchState : State<String> = _searchState
 
     init {
-        savedStateHandle.get<String>("group")?.let {
+        savedStateHandle.get<String>("group")?.let { generation ->
             viewModelScope.launch {
                 repository.selectPokemonList(
+                    generation = generation,
                     successListener = {
                         _pokemonList.addAll(it)
                     },

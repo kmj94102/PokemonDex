@@ -31,6 +31,7 @@ import com.example.pokemondex.R
 import com.example.pokemondex.network.data.PokemonListItem
 import com.example.pokemondex.ui.theme.*
 import com.example.pokemondex.util.getBlack
+import com.example.pokemondex.util.getSkyBlue
 import com.example.pokemondex.util.gridItems
 import com.example.pokemondex.util.nonRippleClickable
 import com.example.pokemondex.view.dialog.LoadingDialog
@@ -130,9 +131,9 @@ fun SearchTextField(viewModel: ListViewModel) {
             Text(text = "포켓몬 검색", style = Typography.bodyMedium)
         },
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            containerColor = SkyBlue,
-            cursorColor = SkyBlue,
-            textColor = Black,
+            containerColor = getSkyBlue(),
+            cursorColor = getSkyBlue(),
+            textColor = White,
             unfocusedLabelColor = Gray,
             focusedLabelColor = Blue,
             focusedBorderColor = Blue,
@@ -143,6 +144,7 @@ fun SearchTextField(viewModel: ListViewModel) {
             Image(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "search",
+                colorFilter = ColorFilter.tint(getBlack()),
                 modifier = Modifier.clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
@@ -176,7 +178,7 @@ fun PokemonListItem(
     OutlinedCard(
         border = BorderStroke(width = 1.dp, color = Blue),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = SkyBlue
+            containerColor = getSkyBlue()
         ),
     ) {
         Column(
@@ -203,6 +205,7 @@ fun PokemonListItem(
             Text(
                 text = "#${item.number}",
                 textAlign = TextAlign.Center,
+                color = getBlack(),
                 modifier = Modifier.fillMaxWidth()
             )
         }

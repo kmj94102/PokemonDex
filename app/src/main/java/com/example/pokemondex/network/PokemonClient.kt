@@ -33,10 +33,11 @@ class PokemonClient @Inject constructor(
     }
 
     suspend fun selectPokemonList(
+        generation: String,
         successListener: (List<PokemonListItemTemp>) -> Unit,
         failureListener: () -> Unit
     ) = try {
-        successListener(service.getPokemonList())
+        successListener(service.getPokemonList(generation))
     } catch (e: Exception) {
         e.printStackTrace()
         failureListener()
