@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.pokemondex.view.add.AddEvolutionContainer
 import com.example.pokemondex.view.add.PokemonAddContainer
 import com.example.pokemondex.view.detail.DetailContainer
 import com.example.pokemondex.view.home.HomeContainer
@@ -46,6 +47,14 @@ fun NavigationGraph() {
             exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
             PokemonAddContainer(routeAction = routAction)
+        }
+        /** 포켓몬 진화 추가 화면 **/
+        composable(
+            route = RouteAction.AddEvolution,
+            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
+            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            AddEvolutionContainer(routeAction = routAction)
         }
         /** 리스트 화면 **/
         composable(
@@ -91,6 +100,10 @@ class RouteAction(private val navController: NavController) {
         navController.navigate(Add)
     }
 
+    fun navToAddEvolution() {
+        navController.navigate(AddEvolution)
+    }
+
     fun popupBackStack() {
         navController.popBackStack()
     }
@@ -99,6 +112,7 @@ class RouteAction(private val navController: NavController) {
         const val Home = "home"
         const val Detail = "detail"
         const val Add = "add"
+        const val AddEvolution = "add_evolution"
         const val List = "List"
     }
 

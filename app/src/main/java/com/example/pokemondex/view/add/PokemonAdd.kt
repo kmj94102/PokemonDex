@@ -505,6 +505,7 @@ private fun PokemonAddViewModel.textFieldChange(type: String, value: String) {
 fun CustomTextFiled(
     value: String,
     hint: String,
+    isEnabled: Boolean = true,
     inputType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     changeListener: (String) -> Unit,
@@ -521,6 +522,7 @@ fun CustomTextFiled(
                 style = Typography.bodyMedium,
             )
         },
+        enabled = isEnabled,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = getBlack(),
             containerColor = Color.Transparent,
@@ -543,8 +545,8 @@ fun CustomTextFiled(
 @Composable
 fun CustomButton(
     value: String,
-    clickListener: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    clickListener: () -> Unit
 ) {
     Button(
         onClick = { clickListener() },

@@ -1,9 +1,6 @@
 package com.example.pokemondex.network
 
-import com.example.pokemondex.network.data.Characteristic
-import com.example.pokemondex.network.data.Pokemon
-import com.example.pokemondex.network.data.PokemonListItemTemp
-import com.example.pokemondex.network.data.PokemonResult
+import com.example.pokemondex.network.data.*
 import javax.inject.Inject
 
 class PokemonClient @Inject constructor(
@@ -49,6 +46,38 @@ class PokemonClient @Inject constructor(
         failureListener: () -> Unit
     ) = try {
         successListener(service.getPokemon(number))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun selectPokemonImage(
+        number: String,
+        successListener: (PokemonListItemTemp) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.getPokemonImage(number))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun selectEvolutionType(
+        successListener: (List<Name>) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.getEvolutionType())
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun insertEvolution(
+        list : List<EvolutionInfo>,
+        successListener: (String) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.insertEvolution(list))
     } catch (e: Exception) {
         e.printStackTrace()
         failureListener()

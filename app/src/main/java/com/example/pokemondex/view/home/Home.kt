@@ -53,9 +53,17 @@ fun HomeContainer(routeAction: RouteAction) {
         }
 
         item {
-            Button(onClick = { routeAction.navToAdd() }) {
-                Text(text = "포켓몬 등록")
+
+            Row(modifier = Modifier.padding(horizontal = 24.dp)) {
+                Button(onClick = { routeAction.navToAdd() }) {
+                    Text(text = "포켓몬 등록")
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Button(onClick = { routeAction.navToAddEvolution() }) {
+                    Text(text = "포켓몬 진화 등록")
+                }
             }
+
         }
     }
 }
