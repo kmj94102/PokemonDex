@@ -135,6 +135,7 @@ class AddEvolutionViewModel @Inject constructor(
                 .mapNotNull { it.mapper() },
             successListener = {
                 resultListener(it)
+                numberList.clear()
             },
             failureListener = {
                 resultListener("등록 실패")

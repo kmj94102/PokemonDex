@@ -154,45 +154,6 @@ fun AddEvolutionItem(
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
-        /** 등록하고자 하는 포켓몬 이미지 조회 : 확인용 **/
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            AsyncImage(
-                model = info.beforeImage,
-                contentDescription = "",
-                error = painterResource(id = R.drawable.img_monsterbal),
-                placeholder = painterResource(id = R.drawable.img_monsterbal),
-                modifier = Modifier.size(50.dp)
-            )
-
-            AsyncImage(
-                model = info.afterImage,
-                contentDescription = "",
-                error = painterResource(id = R.drawable.img_monsterbal),
-                placeholder = painterResource(id = R.drawable.img_monsterbal),
-                modifier = Modifier.size(50.dp)
-            )
-
-            /** 이미지 조회 **/
-            CustomButton(
-                value = "조회",
-                modifier = Modifier.width(100.dp)
-            ) {
-                viewModel.event(
-                    AddEvolutionEvent.ImageSelect(
-                        index = index,
-                        failureListener = {
-                            context.toast(it)
-                        }
-                    )
-                )
-            }
-        } // Row
-
-        Spacer(modifier = Modifier.height(10.dp))
-
         /** 진화 전 **/
         CustomTextFiled(
             value = info.beforeNum,
@@ -233,25 +194,6 @@ fun AddEvolutionItem(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        /** 진화 방법 **/
-        CustomTextFiled(
-            value = info.evolutionConditions,
-            hint = "진화 방법",
-            changeListener = {
-                viewModel.event(
-                    AddEvolutionEvent.InputTextChange(
-                        index = index,
-                        code = AddEvolutionViewModel.Conditions,
-                        value = it
-                    )
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) // 진화 방법
-
-        Spacer(modifier = Modifier.height(10.dp))
-
         /** 진화 타입 **/
         ExposedDropdownMenuBox(
             expanded = isExpanded.value,
@@ -288,7 +230,67 @@ fun AddEvolutionItem(
                 )
             }
         } // 진화 타입
+
         Spacer(modifier = Modifier.height(10.dp))
+
+        /** 진화 방법 **/
+        CustomTextFiled(
+            value = info.evolutionConditions,
+            hint = "진화 방법",
+            changeListener = {
+                viewModel.event(
+                    AddEvolutionEvent.InputTextChange(
+                        index = index,
+                        code = AddEvolutionViewModel.Conditions,
+                        value = it
+                    )
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) // 진화 방법
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        /** 등록하고자 하는 포켓몬 이미지 조회 : 확인용 **/
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            AsyncImage(
+                model = info.beforeImage,
+                contentDescription = "",
+                error = painterResource(id = R.drawable.img_monsterbal),
+                placeholder = painterResource(id = R.drawable.img_monsterbal),
+                modifier = Modifier.size(50.dp)
+            )
+
+            AsyncImage(
+                model = info.afterImage,
+                contentDescription = "",
+                error = painterResource(id = R.drawable.img_monsterbal),
+                placeholder = painterResource(id = R.drawable.img_monsterbal),
+                modifier = Modifier.size(50.dp)
+            )
+
+            /** 이미지 조회 **/
+            CustomButton(
+                value = "조회",
+                modifier = Modifier.width(100.dp)
+            ) {
+                viewModel.event(
+                    AddEvolutionEvent.ImageSelect(
+                        index = index,
+                        failureListener = {
+                            context.toast(it)
+                        }
+                    )
+                )
+            }
+        } // Row
+
+        Spacer(modifier = Modifier.height(10.dp))
+
     }
 }
 
@@ -321,7 +323,7 @@ fun TypeDropDownMenu(
 private fun readyLetters(type: String) =
     when(type) {
         "이상한사탕" -> "Lv."
-        "친밀도" -> "친밀도 0 이상\n레벨업"
+        "친밀도" -> "친밀도 0 이상 레벨업"
         "다이맥스" -> "거다이맥스"
         "메가진화" -> "메가진화"
         else -> type

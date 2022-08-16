@@ -22,8 +22,8 @@ data class EvolutionTemp(
     var numbers: String = "",
     var beforeNum: String = "",
     var afterNum: String = "",
-    var evolutionType: String = "",
-    var evolutionConditions: String = "",
+    var evolutionType: String = "이상한사탕",
+    var evolutionConditions: String = "Lv.",
     var beforeImage: String = "",
     var afterImage: String = ""
 ) {
