@@ -26,4 +26,7 @@ interface PokemonService {
     @POST("/evolutions")
     suspend fun insertEvolution(@Body evolutionInfoList: List<EvolutionInfo>): String
 
+    @POST("/pokemons/search")
+    suspend fun searchPokemonList(@Body info: SearchInfo): List<PokemonListItemTemp>
+
 }

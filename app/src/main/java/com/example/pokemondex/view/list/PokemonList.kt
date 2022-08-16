@@ -1,7 +1,6 @@
 package com.example.pokemondex.view.list
 
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -9,17 +8,22 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -118,13 +122,14 @@ fun PokemonListContainer(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchTextField(viewModel: ListViewModel) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     OutlinedTextField(
         value = viewModel.searchState.value,
         onValueChange = {
-            viewModel.event(ListEvent.SearchChange(it))
+            viewModel.event(ListEvent.SearchTextFieldChange(it))
         },
         shape = RoundedCornerShape(30.dp),
         label = {
@@ -133,7 +138,7 @@ fun SearchTextField(viewModel: ListViewModel) {
         colors = TextFieldDefaults.outlinedTextFieldColors(
             containerColor = getSkyBlue(),
             cursorColor = getSkyBlue(),
-            textColor = White,
+            textColor = getBlack(),
             unfocusedLabelColor = Gray,
             focusedLabelColor = Blue,
             focusedBorderColor = Blue,
@@ -145,16 +150,28 @@ fun SearchTextField(viewModel: ListViewModel) {
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "search",
                 colorFilter = ColorFilter.tint(getBlack()),
-                modifier = Modifier.clickable(
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
+                    viewModel.event(ListEvent.Search)
                 }
             )
         },
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                viewModel.event(ListEvent.Search)
+                keyboardController?.hide()
+            }
+        ),
         modifier = Modifier
-            .fillMaxWidth()
             .padding(horizontal = 24.dp)
+            .fillMaxWidth()
     )
 }
 

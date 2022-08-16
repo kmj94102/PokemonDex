@@ -83,4 +83,15 @@ class PokemonClient @Inject constructor(
         failureListener()
     }
 
+    suspend fun selectSearchPokemonList(
+        searchInfo: SearchInfo,
+        successListener: (List<PokemonListItemTemp>) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.searchPokemonList(searchInfo))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
 }

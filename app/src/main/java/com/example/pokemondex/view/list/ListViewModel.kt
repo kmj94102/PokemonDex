@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokemondex.network.data.PokemonListItem
+import com.example.pokemondex.network.data.SearchInfo
 import com.example.pokemondex.repository.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,8 @@ class ListViewModel @Inject constructor(
     private val repository: ListRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
+
+    private lateinit var group: String
 
     private val _stateFlow = MutableStateFlow<Event>(Event.Init)
     val stateFlow : StateFlow<Event> = _stateFlow
@@ -34,6 +37,7 @@ class ListViewModel @Inject constructor(
 
     init {
         savedStateHandle.get<String>("group")?.let { generation ->
+            group = generation
             viewModelScope.launch {
                 repository.selectPokemonList(
                     generation = generation,
@@ -51,12 +55,43 @@ class ListViewModel @Inject constructor(
 
     fun event(event: ListEvent) {
         when(event) {
-            is ListEvent.SearchChange -> {
+            is ListEvent.SearchTextFieldChange -> {
                 _searchState.value = event.value
             }
             is ListEvent.ImageStateChange -> {
                 _imageState.value = _imageState.value.not()
             }
+            is ListEvent.Search -> {
+                searchPokemons()
+            }
+        }
+    }
+
+    private fun searchPokemons() = viewModelScope.launch {
+        _pokemonList.clear()
+        _stateFlow.emit(Event.Init)
+
+        repository.selectSearchPokemonList(
+            searchInfo = SearchInfo(
+                generations = getGenerationList(),
+                searchText = _searchState.value
+            ),
+            successListener = {
+                _pokemonList.addAll(it)
+            },
+            failureListener = {
+                _pokemonList.isEmpty()
+            }
+        )
+
+        _stateFlow.emit(Event.Complete)
+    }
+
+    private fun getGenerationList(): List<Int> {
+        return if (group == "all") {
+            listOf(1,2,3,4,5,6,7,8)
+        } else {
+            listOf(group.toInt())
         }
     }
 
