@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">PokemonDex</string>
+
+    <!-- 홈 -->
     <string name="pokedex">포켓몬 도감</string>
+    <string name="generation">세대</string>
+    <string name="add_pokemon">포켓몬\n등록</string>
+    <string name="add_evolution">진화\n등록</string>
 </resources>

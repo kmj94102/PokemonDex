@@ -1,12 +1,17 @@
 package com.example.pokemondex.view.home
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -15,57 +20,84 @@ import androidx.compose.ui.unit.sp
 import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.MainColor
 import com.example.pokemondex.ui.theme.Typography
+import com.example.pokemondex.ui.theme.Yellow
 import com.example.pokemondex.util.Constants.generationList
+import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.getWhite
 import com.example.pokemondex.util.gridItems
 import com.example.pokemondex.view.navigation.RouteAction
 
 @Composable
-fun HomeContainer(routeAction: RouteAction) {
+fun HomeScreen(routeAction: RouteAction) {
+    val context = LocalContext.current
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = 25.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        item { HomeHeader() }
+        item { Spacer(modifier = Modifier.height(25.dp)) }
+        homeBody(routeAction, context)
+    }
+}
 
+@Composable
+fun HomeHeader() {
+    /** 홈 화면 타이틀 **/
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(id = R.string.pokedex),
+            style = Typography.titleLarge,
+            fontSize = 36.sp,
+            color = MainColor,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+fun LazyListScope.homeBody(
+    routeAction: RouteAction,
+    context: Context
+) {
+    // all ~ 9세대 버튼 이름 및 이미지 리스트
     val list = generationList
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            Text(
-                text = stringResource(id = R.string.pokedex),
-                style = Typography.titleLarge,
-                fontSize = 36.sp,
-                color = MainColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 25.dp)
-            )
+    /** 각 세대별 버튼 그리드 형식 표시 **/
+    gridItems(
+        data = list,
+        columnCount = 2,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) { itemData ->
+        HomeCardButton(itemData) {
+            routeAction.navToList(it.replace(context.getString(R.string.generation), ""))
         }
+    } // 각 세대별 버튼 그리드 형식 표시
 
-        item { Spacer(modifier = Modifier.height(25.dp)) }
+    /** 포켓몬 등록, 진화 등록 버튼 **/
+    item {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            /** 포켓몬 등록 버튼 **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.add_pokemon), R.drawable.img_add_pokemon),
+                modifier = Modifier.weight(1f)
+            ) {
+                routeAction.navToAdd()
+            } // 포켓몬 등록 버튼
 
-        gridItems(
-            data = list,
-            columnCount = 2,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) { itemData ->
-            HomeCardButton(itemData) {
-                routeAction.navToList(it.replace("세대", ""))
-            }
-        }
+            Spacer(modifier = Modifier.width(10.dp))
 
-        item {
-
-            Row(modifier = Modifier.padding(horizontal = 24.dp)) {
-                Button(onClick = { routeAction.navToAdd() }) {
-                    Text(text = "포켓몬 등록")
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-                Button(onClick = { routeAction.navToAddEvolution() }) {
-                    Text(text = "포켓몬 진화 등록")
-                }
-            }
-
-        }
-    }
+            /** 진화 등록 **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.add_evolution), R.drawable.img_add_evolution),
+                modifier = Modifier.weight(1f)
+            ) {
+                routeAction.navToAddEvolution()
+            } // 진화 등록
+        } // Row
+    } // 포켓몬 등록, 진화 등록 버튼
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,12 +107,9 @@ fun HomeCardButton(
     modifier: Modifier = Modifier,
     clickListener: (String) -> Unit
 ) {
-    ElevatedCard(
+    Card(
         colors = CardDefaults.elevatedCardColors(
             containerColor = getWhite(),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
         ),
         onClick = {
             clickListener(data.first)
@@ -88,15 +117,13 @@ fun HomeCardButton(
         modifier = modifier
             .fillMaxWidth()
             .height(102.dp)
+            .shadow(
+                elevation = 6.dp,
+                spotColor = getBlack(),
+                shape = RoundedCornerShape(10.dp)
+            )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = data.first,
-                fontSize = 20.sp,
-                style = Typography.bodyLarge,
-                color = MainColor,
-                modifier = Modifier.padding(13.dp)
-            )
             Image(
                 painter = painterResource(id = data.second),
                 contentDescription = "image",
@@ -105,6 +132,14 @@ fun HomeCardButton(
                     .height(102.dp)
                     .align(Alignment.BottomEnd)
             )
-        }
-    }
+            Text(
+                text = data.first,
+                fontSize = 20.sp,
+                style = Typography.bodyLarge,
+                color = MainColor,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(13.dp)
+            )
+        } // Box
+    } // Card
 }
