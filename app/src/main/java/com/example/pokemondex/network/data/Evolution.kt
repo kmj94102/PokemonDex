@@ -1,22 +1,33 @@
 package com.example.pokemondex.network.data
 
 data class EvolutionResult(
-    val numbers: String?= null,
-    val beforeNum: String?= null,
-    val afterNum: String?= null,
-    val evolutionType: String?= null,
+    val beforeDot: String?= null,
+    val beforeShinyDot: String?= null,
+    val afterDot: String?= null,
+    val afterShinyDot: String?= null,
+    val evolutionImage: String?= null,
     val evolutionConditions: String?= null
 ) {
-    fun mapper(): EvolutionInfo? {
-        return EvolutionInfo(
-            numbers = numbers ?: return null,
-            beforeNum = beforeNum ?: return null,
-            afterNum = afterNum ?: return null,
-            evolutionType = evolutionType ?: return null,
+    fun mapper(): Evolution? {
+        return Evolution(
+            beforeDot = beforeDot ?: return null,
+            beforeShinyDot = beforeShinyDot ?: return null,
+            afterDot = afterDot ?: return null,
+            afterShinyDot = afterShinyDot ?: return null,
+            evolutionImage = evolutionImage ?: return null,
             evolutionConditions = evolutionConditions ?: return null,
         )
     }
 }
+
+data class Evolution(
+    val beforeDot: String,
+    val beforeShinyDot: String,
+    val afterDot: String,
+    val afterShinyDot: String,
+    val evolutionImage: String,
+    val evolutionConditions: String
+)
 
 data class EvolutionTemp(
     var numbers: String = "",

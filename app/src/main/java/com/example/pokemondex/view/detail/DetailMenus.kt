@@ -27,9 +27,7 @@ import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.example.pokemondex.R
-import com.example.pokemondex.network.data.PokemonItem
-import com.example.pokemondex.network.data.StatusInfo
-import com.example.pokemondex.network.data.getTypeImage
+import com.example.pokemondex.network.data.*
 import com.example.pokemondex.ui.theme.MainColor
 import com.example.pokemondex.ui.theme.Typography
 import com.example.pokemondex.ui.theme.White
@@ -285,7 +283,11 @@ private fun LazyListScope.damageItems(
 }
 
 @Composable
-fun EvolutionContainer(modifier: Modifier = Modifier) {
+fun EvolutionContainer(
+    list: List<Evolution>,
+    isShiny: MutableState<Boolean>,
+    modifier: Modifier = Modifier
+) {
 
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
@@ -300,89 +302,62 @@ fun EvolutionContainer(modifier: Modifier = Modifier) {
 
     LazyColumn(
         modifier = modifier
-            .padding(horizontal = 24.dp, vertical = 20.dp)
+            .padding(horizontal = 24.dp)
     ) {
-        item {
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                AsyncImage(
-                    model = getPokemonDotImage(172),
-                    contentDescription = "image",
-                    error = painterResource(id = R.drawable.img_monsterbal),
-                    placeholder = painterResource(id = R.drawable.img_monsterbal),
-                    imageLoader = imageLoader,
-                    modifier = Modifier.size(80.dp)
-                )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                ) {
-                    AsyncImage(
-                        model = EvolutionItem.SootheBell.image,
-                        contentDescription = "image",
-                        imageLoader = imageLoader,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Text(
-                        text = "친밀도 220 이상\n레벨업",
-                        textAlign = TextAlign.Center,
-                        style = Typography.bodyMedium
-                    )
-                }
-                AsyncImage(
-                    model = getPokemonDotImage(25),
-                    contentDescription = "image",
-                    error = painterResource(id = R.drawable.img_monsterbal),
-                    placeholder = painterResource(id = R.drawable.img_monsterbal),
-                    imageLoader = imageLoader,
-                    modifier = Modifier.size(80.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(25.dp))
+        item { Spacer(modifier = Modifier.height(20.dp)) }
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                AsyncImage(
-                    model = getPokemonDotImage(25),
-                    contentDescription = "image",
-                    error = painterResource(id = R.drawable.img_monsterbal),
-                    placeholder = painterResource(id = R.drawable.img_monsterbal),
-                    imageLoader = imageLoader,
-                    modifier = Modifier.size(80.dp)
-                )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.align(Alignment.CenterVertically)
+        item {
+            list.forEach {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     AsyncImage(
-                        model = EvolutionItem.Dynamax.image,
+                        model = if (isShiny.value) it.beforeShinyDot else it.beforeDot,
                         contentDescription = "image",
+                        error = painterResource(id = R.drawable.img_monsterbal),
+                        placeholder = painterResource(id = R.drawable.img_monsterbal),
                         imageLoader = imageLoader,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier
+                            .size(80.dp)
+                            .weight(1f)
                     )
-                    Text(
-                        text = EvolutionItem.ThunderStone.itemName,
-                        textAlign = TextAlign.Center,
-                        style = Typography.bodyMedium
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .size(100.dp)
+                    ) {
+                        AsyncImage(
+                            model = it.evolutionImage,
+                            contentDescription = "image",
+                            imageLoader = imageLoader,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = it.evolutionConditions,
+                            textAlign = TextAlign.Center,
+                            style = Typography.bodyMedium
+                        )
+                    }
+                    AsyncImage(
+                        model = if (isShiny.value) it.afterShinyDot else it.afterDot,
+                        contentDescription = "image",
+                        error = painterResource(id = R.drawable.img_monsterbal),
+                        placeholder = painterResource(id = R.drawable.img_monsterbal),
+                        imageLoader = imageLoader,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .weight(1f)
                     )
                 }
-                AsyncImage(
-                    model = getPokemonDotImage(26),
-                    contentDescription = "image",
-                    error = painterResource(id = R.drawable.img_monsterbal),
-                    placeholder = painterResource(id = R.drawable.img_monsterbal),
-                    imageLoader = imageLoader,
-                    modifier = Modifier.size(80.dp)
-                )
+
+                Spacer(modifier = Modifier.height(25.dp))
             }
-        }
-    }
+        } // item
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+    } // LazyColumn
 
 }

@@ -19,6 +19,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.pokemondex.R
+import com.example.pokemondex.network.data.Evolution
+import com.example.pokemondex.network.data.EvolutionInfo
 import com.example.pokemondex.network.data.PokemonItem
 import com.example.pokemondex.network.data.getTypeImage
 import com.example.pokemondex.ui.theme.Black
@@ -47,7 +49,7 @@ fun DetailContainer(
         TabItem.Description(info),
         TabItem.Status(info.status),
         TabItem.TypeCompatibility(viewModel.typeCompatibility),
-        TabItem.EvolutionContainer
+        TabItem.EvolutionContainer(info.evolutionList, isShiny)
     )
     val pagerState = rememberPagerState(initialPage = 0)
     val tabIndex = pagerState.currentPage
@@ -273,10 +275,15 @@ sealed class TabItem(val name: String, val screenToLoad: @Composable () -> Unit)
         }
     )
 
-    object EvolutionContainer : TabItem(
+    data class EvolutionContainer(
+        val list: List<Evolution>,
+        val isShiny: MutableState<Boolean>
+    ) : TabItem(
         name = "진화",
         screenToLoad = {
             EvolutionContainer(
+                list = list,
+                isShiny = isShiny,
                 modifier = Modifier.fillMaxSize()
             )
         }

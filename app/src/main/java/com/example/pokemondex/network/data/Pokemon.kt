@@ -3,7 +3,8 @@ package com.example.pokemondex.network.data
 data class PokemonResult(
     val info: Pokemon,
     val before: PokemonListItemTemp?,
-    val after: PokemonListItemTemp?
+    val after: PokemonListItemTemp?,
+    val evolution: List<EvolutionResult>
 ) {
     fun itemMapper() : PokemonItem? {
         return PokemonItem(
@@ -21,7 +22,8 @@ data class PokemonResult(
             description = info.description ?: return null,
             generation = info.generation ?: return null,
             before = before?.mapper(),
-            after = after?.mapper()
+            after = after?.mapper(),
+            evolutionList = evolution.mapNotNull { it.mapper() }
         )
     }
 }
@@ -58,7 +60,8 @@ data class PokemonItem(
     val description: String = "",
     val generation: Int = 0,
     val before: PokemonListItem? = null,
-    val after: PokemonListItem? = null
+    val after: PokemonListItem? = null,
+    val evolutionList: List<Evolution> = emptyList()
 )
 
 data class PokemonListItemTemp(
