@@ -1,10 +1,8 @@
 package com.example.pokemondex.view.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
@@ -12,8 +10,8 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.pokemondex.view.add.AddEvolutionContainer
 import com.example.pokemondex.view.add.PokemonAddContainer
-import com.example.pokemondex.view.detail.DetailContainer
-import com.example.pokemondex.view.home.HomeContainer
+import com.example.pokemondex.view.detail.DetailScreen
+import com.example.pokemondex.view.home.HomeScreen
 import com.example.pokemondex.view.list.PokemonListContainer
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -35,24 +33,24 @@ fun NavigationGraph() {
         /** 홈 화면 **/
         composable(
             route = RouteAction.Home,
-            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
-            HomeContainer(routeAction = routAction)
+            HomeScreen(routeAction = routAction)
         }
         /** 포켓몬 추가 화면 **/
         composable(
             route = RouteAction.Add,
-            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
             PokemonAddContainer(routeAction = routAction)
         }
         /** 포켓몬 진화 추가 화면 **/
         composable(
             route = RouteAction.AddEvolution,
-            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
             AddEvolutionContainer(routeAction = routAction)
         }
@@ -62,21 +60,47 @@ fun NavigationGraph() {
             arguments = listOf(
                 navArgument("group") { type = NavType.StringType }
             ),
-            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
             PokemonListContainer(routeAction = routAction)
         }
         /** 포켓몬 상세 화면 **/
         composable(
-            route = "${RouteAction.Detail}/{number}",
+            route = "${RouteAction.Detail}/{number}={isShiny}",
             arguments = listOf(
                 navArgument("number") { type = NavType.StringType },
+                navArgument("isShiny") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
             ),
-            enterTransition = { scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { scaleOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
-        ){
-            DetailContainer(routeAction = routAction)
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 1000 },
+                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
+                )
+            },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            DetailScreen(routeAction = routAction)
+        }
+        /** 포켓몬 상세 화면 : 이전 버튼 클릭 **/
+        composable(
+            route = "${RouteAction.Detail}/before/{number}={isShiny}",
+            arguments = listOf(
+                navArgument("number") { type = NavType.StringType },
+                navArgument("isShiny") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            ),
+            enterTransition = {
+                slideInHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+            },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            DetailScreen(routeAction = routAction)
         }
     }
 
@@ -88,8 +112,24 @@ class RouteAction(private val navController: NavController) {
         navController.navigate("$List/$group")
     }
 
-    fun navToDetail(number: String, needPopupBackStack: Boolean = false) {
-        navController.navigate("$Detail/$number") {
+    fun navToDetail(
+        number: String,
+        needPopupBackStack: Boolean = false,
+        isShiny: Boolean = false
+    ) {
+        navController.navigate("$Detail/$number=$isShiny") {
+            if (needPopupBackStack) {
+                popupBackStack()
+            }
+        }
+    }
+
+    fun navToDetailBefore(
+        number: String,
+        needPopupBackStack: Boolean = false,
+        isShiny: Boolean = false
+    ) {
+        navController.navigate("$Detail/before/$number=$isShiny") {
             if (needPopupBackStack) {
                 popupBackStack()
             }
