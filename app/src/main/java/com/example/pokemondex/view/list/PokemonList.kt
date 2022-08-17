@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -61,52 +62,10 @@ fun PokemonListContainer(
             ) { focusManager.clearFocus() }
     ) {
         /** 상단 타이틀 **/
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_prev),
-                contentDescription = "prev",
-                colorFilter = ColorFilter.tint(getBlack()),
-                modifier = Modifier
-                    .padding(all = 17.dp)
-                    .nonRippleClickable { routeAction.popupBackStack() }
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_menu),
-                contentDescription = "menu",
-                colorFilter = ColorFilter.tint(getBlack()),
-                modifier = Modifier
-                    .padding(top = 17.dp, end = 24.dp)
-                    .nonRippleClickable {
-                        viewModel.event(ListEvent.ImageStateChange)
-                    }
-            )
-        } // 상단 타이틀
+        PokemonListHeader(routeAction, viewModel)
 
-        /** 검색창 **/
-        SearchTextField(viewModel)
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-        ) {
-            gridItems(
-                data = viewModel.pokemonList,
-                columnCount = 4,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) { item ->
-                PokemonListItem(
-                    item = item,
-                    isShiny = viewModel.imageState.value,
-                    clickListener = {
-                        routeAction.navToDetail(it)
-                    }
-                )
-            }
-        }
+        /** 검색창, 포켓몬 리스트 **/
+        PokemonListBody(routeAction, viewModel)
 
         when (state.value) {
             ListViewModel.Event.Init -> {
@@ -122,6 +81,66 @@ fun PokemonListContainer(
     }
 }
 
+@Composable
+fun PokemonListHeader(
+    routeAction: RouteAction,
+    viewModel: ListViewModel
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_prev),
+            contentDescription = "prev",
+            colorFilter = ColorFilter.tint(getBlack()),
+            modifier = Modifier
+                .padding(all = 17.dp)
+                .nonRippleClickable { routeAction.popupBackStack() }
+        )
+        Image(
+            painter = painterResource(id = R.drawable.ic_menu),
+            contentDescription = "menu",
+            colorFilter = ColorFilter.tint(getBlack()),
+            modifier = Modifier
+                .padding(top = 17.dp, end = 24.dp)
+                .nonRippleClickable {
+                    viewModel.event(ListEvent.ImageStateChange)
+                }
+        )
+    }
+}
+
+@Composable
+fun PokemonListBody(
+    routeAction: RouteAction,
+    viewModel: ListViewModel
+) {
+    /** 검색창 **/
+    SearchTextField(viewModel)
+
+    /** 포켓몬 리스트 **/
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        gridItems(
+            data = viewModel.pokemonList,
+            columnCount = 4,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) { item ->
+            PokemonListItem(
+                item = item,
+                isShiny = viewModel.imageState.value,
+                clickListener = {
+                    routeAction.navToDetail(it)
+                }
+            )
+        }
+    } // 포켓몬 리스트
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchTextField(viewModel: ListViewModel) {
@@ -133,7 +152,7 @@ fun SearchTextField(viewModel: ListViewModel) {
         },
         shape = RoundedCornerShape(30.dp),
         label = {
-            Text(text = "포켓몬 검색", style = Typography.bodyMedium)
+            Text(text = stringResource(id = R.string.search), style = Typography.bodyMedium)
         },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             containerColor = getSkyBlue(),
@@ -153,11 +172,11 @@ fun SearchTextField(viewModel: ListViewModel) {
                 modifier = Modifier
                     .padding(end = 20.dp)
                     .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    viewModel.event(ListEvent.Search)
-                }
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        viewModel.event(ListEvent.Search)
+                    }
             )
         },
         keyboardOptions = KeyboardOptions(
