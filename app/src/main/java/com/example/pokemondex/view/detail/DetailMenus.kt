@@ -16,9 +16,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,22 +40,27 @@ import com.google.accompanist.flowlayout.FlowRow
 fun DescriptionContainer(
     info: PokemonItem,
     modifier: Modifier = Modifier
-) =
+) {
     LazyColumn(
         modifier = modifier
             .padding(horizontal = 24.dp)
     ) {
-        /** 포켓몬 설명 **/
+        /** 포켓몬 소개 **/
         item {
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = getWhite()
                 ),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = 10.dp
+                    defaultElevation = 0.dp
                 ),
                 modifier = Modifier
                     .padding(top = 20.dp)
+                    .shadow(
+                        elevation = 10.dp,
+                        spotColor = getBlack(),
+                        shape = RoundedCornerShape(10.dp)
+                    )
             ) {
                 Text(
                     text = info.description,
@@ -62,14 +69,14 @@ fun DescriptionContainer(
                     modifier = Modifier.padding(12.dp)
                 )
             }
-        }
+        } // 포켓몬 소개
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
         /** 포켓몬 분류 **/
         item {
             Text(
-                text = "분류",
+                text = stringResource(id = R.string.classification),
                 style = Typography.bodyLarge,
                 color = MainColor
             )
@@ -81,14 +88,14 @@ fun DescriptionContainer(
                 style = Typography.bodyMedium,
                 color = getBlack()
             )
-        }
+        } // 포켓몬 분류
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
         /** 포켓몬 특성 **/
         item {
             Text(
-                text = "특성",
+                text = stringResource(id = R.string.characteristic),
                 style = Typography.bodyLarge,
                 color = MainColor
             )
@@ -104,13 +111,14 @@ fun DescriptionContainer(
                 )
             }
         }
-    }
+    } // 포켓몬 특성
+}
 
 @Composable
 fun StatusContainer(
     status: String,
     modifier: Modifier = Modifier
-) =
+) {
     LazyColumn(
         modifier = modifier.padding(top = 20.dp)
     ) {
@@ -127,6 +135,8 @@ fun StatusContainer(
             }
         }
     }
+}
+
 
 @Composable
 fun CustomProgressBar(
@@ -256,7 +266,7 @@ fun TypeCompatibilityContainer(
 private fun LazyListScope.damageItems(
     text: String,
     list: List<String>
-){
+) {
     item {
         Text(
             text = text,
@@ -285,10 +295,61 @@ private fun LazyListScope.damageItems(
 @Composable
 fun EvolutionContainer(
     list: List<Evolution>,
-    isShiny: MutableState<Boolean>,
+    isShiny: Boolean,
     modifier: Modifier = Modifier
 ) {
+    LazyColumn(
+        modifier = modifier
+            .padding(horizontal = 24.dp)
+    ) {
+        item { Spacer(modifier = Modifier.height(20.dp)) }
 
+        /** 진화 정보 : 이미지, 진화 조건 **/
+        item {
+            if (list.isEmpty()) return@item
+
+            list.forEach {
+                EvolutionRow(it, isShiny)
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+        } // 진화 정보
+
+        /** 진화 정보 없을 시 이미지 **/
+        item {
+            if (list.isNotEmpty()) return@item
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.img_empty4),
+                    contentDescription = "empty"
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = stringResource(id = R.string.empty_evolution),
+                    style = Typography.bodyLarge,
+                    color = getBlack(),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
+        } // 진화 정보 없을 시 이미지
+
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+    } // LazyColumn
+}
+
+@Composable
+fun EvolutionRow(
+    evolutionInfo: Evolution,
+    isShiny: Boolean
+) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .components {
@@ -300,64 +361,49 @@ fun EvolutionContainer(
         }
         .build()
 
-    LazyColumn(
-        modifier = modifier
-            .padding(horizontal = 24.dp)
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-
-        item {
-            list.forEach {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    AsyncImage(
-                        model = if (isShiny.value) it.beforeShinyDot else it.beforeDot,
-                        contentDescription = "image",
-                        error = painterResource(id = R.drawable.img_monsterbal),
-                        placeholder = painterResource(id = R.drawable.img_monsterbal),
-                        imageLoader = imageLoader,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .weight(1f)
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .size(100.dp)
-                    ) {
-                        AsyncImage(
-                            model = it.evolutionImage,
-                            contentDescription = "image",
-                            imageLoader = imageLoader,
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = it.evolutionConditions,
-                            textAlign = TextAlign.Center,
-                            style = Typography.bodyMedium
-                        )
-                    }
-                    AsyncImage(
-                        model = if (isShiny.value) it.afterShinyDot else it.afterDot,
-                        contentDescription = "image",
-                        error = painterResource(id = R.drawable.img_monsterbal),
-                        placeholder = painterResource(id = R.drawable.img_monsterbal),
-                        imageLoader = imageLoader,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .weight(1f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(25.dp))
-            }
-        } // item
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-    } // LazyColumn
-
+        AsyncImage(
+            model = if (isShiny) evolutionInfo.beforeShinyDot else evolutionInfo.beforeDot,
+            contentDescription = "image",
+            error = painterResource(id = R.drawable.img_monsterbal),
+            placeholder = painterResource(id = R.drawable.img_monsterbal),
+            imageLoader = imageLoader,
+            modifier = Modifier
+                .size(80.dp)
+                .weight(1f)
+        )
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .size(100.dp)
+        ) {
+            AsyncImage(
+                model = evolutionInfo.evolutionImage,
+                contentDescription = "image",
+                imageLoader = imageLoader,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = evolutionInfo.evolutionConditions,
+                textAlign = TextAlign.Center,
+                style = Typography.bodyMedium
+            )
+        }
+        AsyncImage(
+            model = if (isShiny) evolutionInfo.afterShinyDot else evolutionInfo.afterDot,
+            contentDescription = "image",
+            error = painterResource(id = R.drawable.img_monsterbal),
+            placeholder = painterResource(id = R.drawable.img_monsterbal),
+            imageLoader = imageLoader,
+            modifier = Modifier
+                .size(80.dp)
+                .weight(1f)
+        )
+    }
 }

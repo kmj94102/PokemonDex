@@ -1,9 +1,22 @@
 <resources>
     <string name="app_name">PokemonDex</string>
 
-    <!-- 홈 -->
+    <!-- 홈 화면 -->
     <string name="pokedex">포켓몬 도감</string>
     <string name="generation">세대</string>
     <string name="add_pokemon">포켓몬\n등록</string>
     <string name="add_evolution">진화\n등록</string>
+
+    <!-- 상세 화면 -->
+    <string name="description">설명</string>
+    <string name="status">스테이터스</string>
+    <string name="type_compatibility">상성</string>
+    <string name="evolution">진화</string>
+    <string name="classification">분류</string>
+    <string name="characteristic">특성</string>
+    <string name="empty_evolution">진화 정보가 없습니다.</string>
+
+    <!-- 공용 -->
+    <string name="ok">확인</string>
+    <string name="load_error">데이터 조회에 실패하였습니다.</string>
 </resources>

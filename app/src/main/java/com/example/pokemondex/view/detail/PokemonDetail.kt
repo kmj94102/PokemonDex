@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,135 +21,212 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.pokemondex.R
 import com.example.pokemondex.network.data.Evolution
-import com.example.pokemondex.network.data.EvolutionInfo
 import com.example.pokemondex.network.data.PokemonItem
 import com.example.pokemondex.network.data.getTypeImage
 import com.example.pokemondex.ui.theme.Black
 import com.example.pokemondex.ui.theme.Typography
 import com.example.pokemondex.util.CustomScrollableTabRow
-import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.getWhite
 import com.example.pokemondex.util.nonRippleClickable
+import com.example.pokemondex.view.dialog.ConfirmDialog
+import com.example.pokemondex.view.dialog.LoadingDialog
 import com.example.pokemondex.view.navigation.RouteAction
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun DetailContainer(
+fun DetailScreen(
     routeAction: RouteAction,
-    viewModel: DetailViewModel = hiltViewModel()
+    viewModel: DetailViewModel = hiltViewModel(),
 ) {
 
     val info = viewModel.pokemonInfo.value
-    val isShiny = remember { mutableStateOf(false) }
-
-    val tabData = listOf(
-        TabItem.Description(info),
-        TabItem.Status(info.status),
-        TabItem.TypeCompatibility(viewModel.typeCompatibility),
-        TabItem.EvolutionContainer(info.evolutionList, isShiny)
-    )
-    val pagerState = rememberPagerState(initialPage = 0)
-    val tabIndex = pagerState.currentPage
-    val coroutineScope = rememberCoroutineScope()
+    val isShiny = viewModel.isShiny.value
+    val stateCollector = viewModel.eventFlow.collectAsState()
+    val isLoading = remember { mutableStateOf(false) }
+    val isError = remember { mutableStateOf(false) }
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFFF6A8))
     ) {
-        val (titleRow, txtName, attributeRow, mainImage,
-            isShinyButton, infoCard) = createRefs()
-        /** 상단 타이틀 **/
-        Box(
-            Modifier
+        val (header, body, footer) = createRefs()
+        /** 타이틀 **/
+        DetailHeader(
+            routeAction = routeAction,
+            info = info,
+            isShiny = isShiny,
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(58.dp)
-                .constrainAs(titleRow) {
+                .constrainAs(header) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-        ) {
-            if (info.before != null) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_prev),
-                    contentDescription = "prev",
-                    colorFilter = ColorFilter.tint(Black),
-                    modifier = Modifier
-                        .padding(17.dp)
-                        .align(Alignment.CenterStart)
-                        .nonRippleClickable {
-                            routeAction.navToDetail(info.before.number, true)
-                        }
-                )
+        ) // DetailHeader
 
-                AsyncImage(
-                    model = if (isShiny.value) info.before.dotShinyImage else info.before.dotImage,
-                    contentDescription = "이미지",
-                    error = painterResource(id = R.drawable.img_monsterbal),
-                    placeholder = painterResource(id = R.drawable.img_monsterbal),
-                    modifier = Modifier
-                        .padding(start = 50.dp)
-                        .align(Alignment.CenterStart)
-                        .size(42.dp)
-                        .nonRippleClickable {
-                            routeAction.navToDetail(info.before.number, true)
-                        }
-                )
+        /** 포켓몬 정보 표시 **/
+        DetailFooter(
+            info = info,
+            viewModel = viewModel,
+            isShiny = isShiny,
+            modifier = Modifier.constrainAs(footer) {
+                top.linkTo(body.bottom, (-27).dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
+                width = Dimension.fillToConstraints
+                height = Dimension.fillToConstraints
             }
+        ) // DetailFooter
 
-            Text(
-                text = "#${info.number}",
-                textAlign = TextAlign.Center,
-                style = Typography.titleLarge,
-                color = Black,
-                fontSize = 24.sp,
+        /** 포켓몬 이름, 속성, 이미지 및 이로치 변경 버튼 표시 **/
+        DetailBody(
+            info = info,
+            viewModel = viewModel,
+            isShiny = isShiny,
+            modifier = Modifier.constrainAs(body) {
+                top.linkTo(header.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        ) // DetailBody
+        
+        if (isLoading.value) {
+            LoadingDialog(isLoading = isLoading)
+        }
+
+        if (isError.value) {
+            ConfirmDialog(
+                message = stringResource(id = R.string.load_error),
+                isShow = isError
+            ) {
+                isError.value = false
+                routeAction.popupBackStack()
+            }
+        }
+
+    } // ConstraintLayout
+    
+    when(stateCollector.value) {
+        DetailViewModel.Event.Init -> {
+            isLoading.value = true
+        }
+        DetailViewModel.Event.Success -> {
+            isLoading.value = false
+        }
+        DetailViewModel.Event.Failure -> {
+            isError.value = true
+        }
+    }
+}
+
+@Composable
+fun DetailHeader(
+    routeAction: RouteAction,
+    info: PokemonItem,
+    isShiny: Boolean,
+    modifier: Modifier = Modifier
+) {
+    /** 상단 타이틀 **/
+    Box(modifier = modifier) {
+        /** 이전 포켓몬 **/
+        if (info.before != null) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_prev),
+                contentDescription = "prev",
+                colorFilter = ColorFilter.tint(Black),
                 modifier = Modifier
-                    .align(Alignment.Center)
+                    .padding(17.dp)
+                    .align(Alignment.CenterStart)
+                    .nonRippleClickable {
+                        routeAction.navToDetailBefore(info.before.number, true, isShiny)
+                    }
             )
 
-            if (info.after != null) {
-                AsyncImage(
-                    model = if (isShiny.value) info.after.dotShinyImage else info.after.dotImage,
-                    contentDescription = "이미지",
-                    error = painterResource(id = R.drawable.img_monsterbal),
-                    placeholder = painterResource(id = R.drawable.img_monsterbal),
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(top = 8.dp, end = 50.dp)
-                        .size(42.dp)
-                        .nonRippleClickable {
-                            routeAction.navToDetail(info.after.number, true)
-                        }
-                )
+            AsyncImage(
+                model = if (isShiny) info.before.dotShinyImage else info.before.dotImage,
+                contentDescription = "이미지",
+                error = painterResource(id = R.drawable.img_monsterbal),
+                placeholder = painterResource(id = R.drawable.img_monsterbal),
+                modifier = Modifier
+                    .padding(start = 50.dp)
+                    .align(Alignment.CenterStart)
+                    .size(42.dp)
+                    .nonRippleClickable {
+                        routeAction.navToDetail(info.before.number, true, isShiny)
+                    }
+            )
+        } // if: 이전 포켓몬
 
-                Image(
-                    painter = painterResource(id = R.drawable.ic_next),
-                    contentDescription = "next",
-                    colorFilter = ColorFilter.tint(Black),
-                    modifier = Modifier
-                        .padding(17.dp)
-                        .align(Alignment.CenterEnd)
-                        .nonRippleClickable {
-                            routeAction.navToDetail(info.after.number, true)
-                        }
-                )
-            }
-        } // 상단 타이틀
+        /** 포켓몬 번호 **/
+        Text(
+            text = "#${info.number}",
+            textAlign = TextAlign.Center,
+            style = Typography.titleLarge,
+            color = Black,
+            fontSize = 24.sp,
+            modifier = Modifier
+                .align(Alignment.Center)
+        ) // 포켓몬 번호
 
+        /** 다음 포켓몬 **/
+        if (info.after != null) {
+            AsyncImage(
+                model = if (isShiny) info.after.dotShinyImage else info.after.dotImage,
+                contentDescription = "이미지",
+                error = painterResource(id = R.drawable.img_monsterbal),
+                placeholder = painterResource(id = R.drawable.img_monsterbal),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(top = 8.dp, end = 50.dp)
+                    .size(42.dp)
+                    .nonRippleClickable {
+                        routeAction.navToDetail(info.after.number, true, isShiny)
+                    }
+            )
+
+            Image(
+                painter = painterResource(id = R.drawable.ic_next),
+                contentDescription = "next",
+                colorFilter = ColorFilter.tint(Black),
+                modifier = Modifier
+                    .padding(17.dp)
+                    .align(Alignment.CenterEnd)
+                    .nonRippleClickable {
+                        routeAction.navToDetail(info.after.number, true, isShiny)
+                    }
+            )
+        } // if : 다음 포켓몬
+    } // 상단 타이틀
+}
+
+@Composable
+fun DetailBody(
+    info: PokemonItem,
+    viewModel: DetailViewModel,
+    isShiny: Boolean,
+    modifier: Modifier = Modifier
+) {
+    ConstraintLayout(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+    ) {
+        val (txtName, attributeRow, isShinyButton, mainImage) = createRefs()
         /** 이름 **/
         Text(
             text = info.name,
             style = Typography.titleLarge,
             fontSize = 24.sp,
-            color = getBlack(),
+            color = Black,
             modifier = Modifier.constrainAs(txtName) {
-                top.linkTo(titleRow.bottom)
-                start.linkTo(parent.start, 24.dp)
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
             }
         ) // 이름
 
@@ -167,62 +245,25 @@ fun DetailContainer(
                 )
             }
         } // 속성
-
         /** 이로치 변경 버튼 **/
         Image(
             painter = painterResource(
-                if (isShiny.value) R.drawable.ic_shiny
+                if (isShiny) R.drawable.ic_shiny
                 else R.drawable.ic_none_shiny
             ),
             contentDescription = "shiny change",
             modifier = Modifier
                 .constrainAs(isShinyButton) {
                     top.linkTo(attributeRow.top)
-                    end.linkTo(parent.end, 24.dp)
+                    end.linkTo(parent.end)
                 }
                 .nonRippleClickable {
-                    isShiny.value = isShiny.value.not()
+                    viewModel.changeShinyState()
                 }
-        )
-
-        Card(
-            shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = getWhite()
-            ),
-            modifier = Modifier.constrainAs(infoCard) {
-                top.linkTo(mainImage.bottom, (-27).dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-                width = Dimension.fillToConstraints
-                height = Dimension.fillToConstraints
-            }
-        ) {
-            CustomScrollableTabRow(
-                tabs = tabData.map { it.name },
-                selectedTabIndex = tabIndex,
-            ) { index ->
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(index)
-                }
-            }
-
-
-
-            HorizontalPager(
-                modifier = Modifier.fillMaxSize(),
-                state = pagerState,
-                count = tabData.size
-            ) { index ->
-                tabData[index].screenToLoad()
-            }
-
-        }
-
+        ) // 이로치 변경 버튼
         /** 메인 이미지 **/
         AsyncImage(
-            model = if (isShiny.value) info.shinyImage
+            model = if (isShiny) info.shinyImage
             else info.image,
             contentDescription = "main Image",
             error = painterResource(id = R.drawable.img_monsterbal),
@@ -234,15 +275,78 @@ fun DetailContainer(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-        )
+        ) // 메인 이미지
     }
 }
 
-sealed class TabItem(val name: String, val screenToLoad: @Composable () -> Unit) {
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun DetailFooter(
+    info: PokemonItem,
+    viewModel: DetailViewModel,
+    isShiny: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val tabData = listOf(
+        TabItem.Description(
+            info = info,
+            tabName = stringResource(id = R.string.description)
+        ),
+        TabItem.Status(
+            status = info.status,
+            tabName = stringResource(id = R.string.status)
+        ),
+        TabItem.TypeCompatibility(
+            list = viewModel.typeCompatibility,
+            tabName = stringResource(id = R.string.type_compatibility)
+        ),
+        TabItem.EvolutionContainer(
+            list = info.evolutionList,
+            isShiny = isShiny,
+            tabName = stringResource(id = R.string.evolution)
+        )
+    )
+    val pagerState = rememberPagerState(initialPage = 0)
+    val tabIndex = pagerState.currentPage
+    val coroutineScope = rememberCoroutineScope()
+
+    Card(
+        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = getWhite()
+        ),
+        modifier = modifier
+    ) {
+        /** 탭 **/
+        CustomScrollableTabRow(
+            tabs = tabData.map { it.name },
+            selectedTabIndex = tabIndex,
+        ) { index ->
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(index)
+            }
+        }
+
+        /** 뷰페이저 **/
+        HorizontalPager(
+            modifier = Modifier.fillMaxSize(),
+            state = pagerState,
+            count = tabData.size
+        ) { index ->
+            tabData[index].screenToLoad()
+        }
+    }
+}
+
+sealed class TabItem(
+    val name: String,
+    val screenToLoad: @Composable () -> Unit
+) {
     data class Description(
-        val info: PokemonItem
+        val info: PokemonItem,
+        val tabName: String
     ) : TabItem(
-        name = "설명",
+        name = tabName,
         screenToLoad = {
             DescriptionContainer(
                 info = info,
@@ -252,9 +356,10 @@ sealed class TabItem(val name: String, val screenToLoad: @Composable () -> Unit)
     )
 
     data class Status(
-        val status: String
+        val status: String,
+        val tabName: String
     ) : TabItem(
-        name = "스테이터스",
+        name = tabName,
         screenToLoad = {
             StatusContainer(
                 status = status,
@@ -264,9 +369,10 @@ sealed class TabItem(val name: String, val screenToLoad: @Composable () -> Unit)
     )
 
     data class TypeCompatibility(
-        val list: List<Pair<Float, String>>
+        val list: List<Pair<Float, String>>,
+        val tabName: String
     ) : TabItem(
-        name = "상성",
+        name = tabName,
         screenToLoad = {
             TypeCompatibilityContainer(
                 list = list,
@@ -277,9 +383,10 @@ sealed class TabItem(val name: String, val screenToLoad: @Composable () -> Unit)
 
     data class EvolutionContainer(
         val list: List<Evolution>,
-        val isShiny: MutableState<Boolean>
+        val isShiny: Boolean,
+        val tabName: String
     ) : TabItem(
-        name = "진화",
+        name = tabName,
         screenToLoad = {
             EvolutionContainer(
                 list = list,
