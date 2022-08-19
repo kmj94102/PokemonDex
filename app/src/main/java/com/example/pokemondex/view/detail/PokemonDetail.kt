@@ -3,11 +3,13 @@ package com.example.pokemondex.view.detail
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -20,9 +22,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.pokemondex.R
-import com.example.pokemondex.network.data.Evolution
-import com.example.pokemondex.network.data.PokemonItem
-import com.example.pokemondex.network.data.getTypeImage
+import com.example.pokemondex.network.data.*
 import com.example.pokemondex.ui.theme.Black
 import com.example.pokemondex.ui.theme.Typography
 import com.example.pokemondex.util.CustomScrollableTabRow
@@ -47,11 +47,14 @@ fun DetailScreen(
     val stateCollector = viewModel.eventFlow.collectAsState()
     val isLoading = remember { mutableStateOf(false) }
     val isError = remember { mutableStateOf(false) }
+    val typeList = info.attribute.split(",").toMutableList()
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFF6A8))
+            .background(
+                brush = Brush.horizontalGradient(getTypeColorList(typeList))
+            )
     ) {
         val (header, body, footer) = createRefs()
         /** 타이틀 **/
