@@ -69,13 +69,15 @@ data class PokemonListItemTemp(
     val name: String?= null,
     val dotImage: String?= null,
     val dotShinyImage: String?= null,
+    val attribute: String?= null
 ) {
     fun mapper(): PokemonListItem? {
         return PokemonListItem(
             number = number ?: return null,
             name = name ?: return null,
             dotImage = dotImage ?: return null,
-            dotShinyImage = dotShinyImage ?: return null
+            dotShinyImage = dotShinyImage ?: return null,
+            attribute = attribute ?: return null
         )
     }
 }
@@ -85,6 +87,7 @@ data class PokemonListItem(
     val name: String,
     val dotImage: String,
     val dotShinyImage: String,
+    val attribute: String
 )
 
 data class PokemonStatusInfo(

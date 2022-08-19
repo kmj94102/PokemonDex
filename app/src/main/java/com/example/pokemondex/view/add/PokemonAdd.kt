@@ -289,7 +289,7 @@ fun PokemonAddContainer(
             columnCount = 3,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.padding(horizontal = 24.dp)
-        ) { data ->
+        ) { data, _ ->
             CustomTextFiled(
                 value = "${data.value}",
                 hint = data.name,

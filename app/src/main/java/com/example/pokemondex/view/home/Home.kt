@@ -70,7 +70,7 @@ fun LazyListScope.homeBody(
         columnCount = 2,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.padding(horizontal = 16.dp)
-    ) { itemData ->
+    ) { itemData, _ ->
         HomeCardButton(itemData) {
             routeAction.navToList(it.replace(context.getString(R.string.generation), ""))
         }

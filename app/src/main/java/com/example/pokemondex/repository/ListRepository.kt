@@ -25,13 +25,21 @@ class ListRepository @Inject constructor(
 
     suspend fun selectSearchPokemonList(
         searchInfo: SearchInfo,
+        typeList: List<String>,
         successListener: (List<PokemonListItem>) -> Unit,
         failureListener: () -> Unit
     ) {
         client.selectSearchPokemonList(
             searchInfo = searchInfo,
             successListener = {
-                it.mapNotNull { item -> item.mapper() }.let(successListener)
+                it.mapNotNull { item -> item.mapper() }.filter { item ->
+                    var result = false
+                    item.attribute.split(",").forEach { type ->
+                        if (result) return@forEach
+                        result = typeList.contains(type)
+                    }
+                    result
+                }.let(successListener)
             },
             failureListener = failureListener
         )
