@@ -12,7 +12,7 @@ import com.example.pokemondex.view.add.AddEvolutionContainer
 import com.example.pokemondex.view.add.PokemonAddContainer
 import com.example.pokemondex.view.detail.DetailScreen
 import com.example.pokemondex.view.home.HomeScreen
-import com.example.pokemondex.view.list.PokemonListContainer
+import com.example.pokemondex.view.list.PokemonListScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -63,7 +63,7 @@ fun NavigationGraph() {
             enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
             exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
-            PokemonListContainer(routeAction = routAction)
+            PokemonListScreen(routeAction = routAction)
         }
         /** 포켓몬 상세 화면 **/
         composable(

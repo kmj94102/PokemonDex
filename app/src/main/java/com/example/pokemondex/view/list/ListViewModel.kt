@@ -21,7 +21,7 @@ class ListViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _stateFlow = MutableStateFlow<Event>(Event.Init)
-    val stateFlow : StateFlow<Event> = _stateFlow
+    val eventStateFlow : StateFlow<Event> = _stateFlow
 
     private val _pokemonList = mutableStateListOf<PokemonListItem>()
     val pokemonList: List<PokemonListItem> = _pokemonList

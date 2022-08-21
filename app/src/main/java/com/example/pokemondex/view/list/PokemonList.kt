@@ -46,56 +46,58 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun PokemonListContainer(
+fun PokemonListScreen(
     routeAction: RouteAction,
     viewModel: ListViewModel = hiltViewModel()
 ) {
 
-    val focusManager = LocalFocusManager.current
-    val loadingState = remember { mutableStateOf(true) }
-
-    val state = viewModel.stateFlow.collectAsState()
     val drawerState = androidx.compose.material.rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalDrawer(
         drawerState = drawerState,
-        /** 메뉴 **/
         drawerContent = {
             MenuBody(scope, drawerState, viewModel)
-        }, // 메뉴
-        /** 포켓몬 리스트 **/
+        },
         content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) { focusManager.clearFocus() }
-            ) {
-                /** 상단 타이틀 **/
-                PokemonListHeader(routeAction, viewModel, scope, drawerState)
-
-                /** 검색창, 포켓몬 리스트 **/
-                PokemonListBody(routeAction, viewModel)
-
-                when (state.value) {
-                    ListViewModel.Event.Init -> {
-                        loadingState.value = true
-                    }
-                    ListViewModel.Event.Complete -> {
-                        loadingState.value = false
-                    }
-                }
-
-                LoadingDialog(loadingState)
-
-            }
-        } // 포켓몬 리스트
+            PokemonListContent(routeAction, viewModel, scope, drawerState)
+        }
     )
+}
 
+@Composable
+fun PokemonListContent(
+    routeAction: RouteAction,
+    viewModel: ListViewModel,
+    scope: CoroutineScope,
+    drawerState: DrawerState
+) {
+    val focusManager = LocalFocusManager.current
+    val loadingState = remember { mutableStateOf(true) }
+    val state = viewModel.eventStateFlow.collectAsState()
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .nonRippleClickable { focusManager.clearFocus() }
+    ) {
+        /** 상단 타이틀 **/
+        PokemonListHeader(routeAction, viewModel, scope, drawerState)
+
+        /** 검색창, 포켓몬 리스트 **/
+        PokemonListBody(routeAction, viewModel)
+
+        when (state.value) {
+            ListViewModel.Event.Init -> {
+                loadingState.value = true
+            }
+            ListViewModel.Event.Complete -> {
+                loadingState.value = false
+            }
+        }
+
+        LoadingDialog(loadingState)
+    }
 }
 
 @Composable
@@ -122,7 +124,8 @@ fun PokemonListHeader(
         Image(
             painter = painterResource(id = if (viewModel.imageState.value) R.drawable.ic_shiny else R.drawable.ic_none_shiny),
             contentDescription = "shiny",
-            modifier = Modifier.padding(top = 17.dp, end = 10.dp)
+            modifier = Modifier
+                .padding(top = 17.dp, end = 10.dp)
                 .size(24.dp)
                 .nonRippleClickable {
                     viewModel.event(ListEvent.ImageStateChange)
@@ -216,7 +219,7 @@ fun SearchTextField(viewModel: ListViewModel) {
             imeAction = ImeAction.Search
         ),
         keyboardActions = KeyboardActions(
-            onDone = {
+            onSearch = {
                 viewModel.event(ListEvent.Search)
                 keyboardController?.hide()
             }
