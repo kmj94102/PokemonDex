@@ -1,27 +1,25 @@
 package com.example.pokemondex.util
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.pokemondex.ui.theme.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import kotlinx.coroutines.launch
 
 @Composable
 fun getWhite() : Color =
@@ -82,76 +80,44 @@ fun <T> LazyListScope.gridItems(
     }
 }
 
-// 출처 : https://medium.com/@sukhdip_sandhu/jetpack-compose-scrollabletabrow-indicator-matches-width-of-text-e79c0e5826fe
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CustomScrollableTabRow(
     tabs: List<String>,
     selectedTabIndex: Int,
-    onTabClick: (Int) -> Unit
+    pagerState: PagerState
 ) {
-    val density = LocalDensity.current
-    val tabWidths = remember {
-        val tabWidthStateList = mutableStateListOf<Dp>()
-        repeat(tabs.size) {
-            tabWidthStateList.add(0.dp)
-        }
-        tabWidthStateList
-    }
+    val coroutineScope = rememberCoroutineScope()
 
-    TabRow(
+    androidx.compose.material.TabRow(
         selectedTabIndex = selectedTabIndex,
-        containerColor = Color.Transparent,
-        contentColor = Color.White,
+        backgroundColor = getWhite(),
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-                modifier = Modifier.customTabIndicatorOffset(
-                    currentTabPosition = tabPositions[selectedTabIndex],
-                    tabWidth = tabWidths[selectedTabIndex]
-                ),
-                color = MainColor
+                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
             )
         },
-        modifier = Modifier.padding(top = 22.dp)
+        divider = {
+            Divider(color = getGray(), modifier = Modifier.height(1.dp))
+        }
     ) {
-        tabs.forEachIndexed { tabIndex, tab ->
+        tabs.forEachIndexed { index, tabItem ->
             Tab(
-                selected = selectedTabIndex == tabIndex,
-                onClick = { onTabClick(tabIndex) },
+                selected = selectedTabIndex == index,
                 selectedContentColor = MainColor,
-                unselectedContentColor = getBlack(),
-                text = {
-                    Text(
-                        text = tab,
-                        onTextLayout = { textLayoutResult ->
-                            tabWidths[tabIndex] =
-                                with(density) { textLayoutResult.size.width.toDp() }
-                        }
-                    )
+                unselectedContentColor = getGray(),
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(index)
+                    }
                 }
-            )
+            ) {
+                Text(
+                    text = tabItem,
+                    style = Typography.bodyLarge,
+                    modifier = Modifier.padding(top = 40.dp, bottom = 8.dp)
+                )
+            }
         }
     }
-}
-
-fun Modifier.customTabIndicatorOffset(
-    currentTabPosition: TabPosition,
-    tabWidth: Dp
-): Modifier = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "customTabIndicatorOffset"
-        value = currentTabPosition
-    }
-) {
-    val currentTabWidth by animateDpAsState(
-        targetValue = tabWidth,
-        animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
-    )
-    val indicatorOffset by animateDpAsState(
-        targetValue = ((currentTabPosition.left + currentTabPosition.right - tabWidth) / 2),
-        animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
-    )
-    fillMaxWidth()
-        .wrapContentSize(Alignment.BottomStart)
-        .offset(x = indicatorOffset)
-        .width(currentTabWidth)
 }

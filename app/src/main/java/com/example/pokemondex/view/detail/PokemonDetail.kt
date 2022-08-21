@@ -3,14 +3,17 @@ package com.example.pokemondex.view.detail
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -22,7 +25,10 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.pokemondex.R
-import com.example.pokemondex.network.data.*
+import com.example.pokemondex.network.data.Evolution
+import com.example.pokemondex.network.data.PokemonItem
+import com.example.pokemondex.network.data.getTypeColorList
+import com.example.pokemondex.network.data.getTypeImage
 import com.example.pokemondex.ui.theme.Black
 import com.example.pokemondex.ui.theme.Typography
 import com.example.pokemondex.util.CustomScrollableTabRow
@@ -34,7 +40,6 @@ import com.example.pokemondex.view.navigation.RouteAction
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.launch
 
 @Composable
 fun DetailScreen(
@@ -70,7 +75,7 @@ fun DetailScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-        ) // DetailHeader
+        ) // 타이틀
 
         /** 포켓몬 정보 표시 **/
         DetailFooter(
@@ -97,7 +102,7 @@ fun DetailScreen(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }
-        ) // DetailBody
+        ) // 포켓몬 정보 표시
         
         if (isLoading.value) {
             LoadingDialog(isLoading = isLoading)
@@ -123,6 +128,7 @@ fun DetailScreen(
             isLoading.value = false
         }
         DetailViewModel.Event.Failure -> {
+            isLoading.value = false
             isError.value = true
         }
     }
@@ -311,7 +317,6 @@ fun DetailFooter(
     )
     val pagerState = rememberPagerState(initialPage = 0)
     val tabIndex = pagerState.currentPage
-    val coroutineScope = rememberCoroutineScope()
 
     Card(
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
@@ -324,11 +329,8 @@ fun DetailFooter(
         CustomScrollableTabRow(
             tabs = tabData.map { it.name },
             selectedTabIndex = tabIndex,
-        ) { index ->
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(index)
-            }
-        }
+            pagerState = pagerState
+        )
 
         /** 뷰페이저 **/
         HorizontalPager(
