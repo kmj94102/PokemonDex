@@ -94,4 +94,25 @@ class PokemonClient @Inject constructor(
         failureListener()
     }
 
+    suspend fun selectEvolutionInfo(
+        number: String,
+        successListener: (List<UpdateEvolutionInfoResult>) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.getEvolutionInfo(number))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun updateEvolution(
+        param: EvolutionUpdateParam,
+        successListener: (String) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.updateEvolution(param))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
 }

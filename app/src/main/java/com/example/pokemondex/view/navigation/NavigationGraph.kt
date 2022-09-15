@@ -13,6 +13,8 @@ import com.example.pokemondex.view.add.PokemonAddContainer
 import com.example.pokemondex.view.detail.DetailScreen
 import com.example.pokemondex.view.home.HomeScreen
 import com.example.pokemondex.view.list.PokemonListScreen
+import com.example.pokemondex.view.update.evolution.UpdateEvolutionContainer
+import com.example.pokemondex.view.update.search.UpdateSearchContainer
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -33,26 +35,45 @@ fun NavigationGraph() {
         /** 홈 화면 **/
         composable(
             route = RouteAction.Home,
-            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
         ) {
             HomeScreen(routeAction = routAction)
         }
         /** 포켓몬 추가 화면 **/
         composable(
             route = RouteAction.Add,
-            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
         ) {
             PokemonAddContainer(routeAction = routAction)
         }
         /** 포켓몬 진화 추가 화면 **/
         composable(
             route = RouteAction.AddEvolution,
-            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
         ) {
             AddEvolutionContainer(routeAction = routAction)
+        }
+        /** 포켓몬 수정을 위한 검색 화면 **/
+        composable(
+            route = RouteAction.UpdateSearch,
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
+        ) {
+            UpdateSearchContainer(routeAction = routAction)
+        }
+        /** 포켓몬 진화 수정 화면 **/
+        composable(
+            route = "${RouteAction.UpdateEvolution}/{index}",
+            arguments = listOf(
+                navArgument("index") { type = NavType.StringType }
+            ),
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
+        ) {
+            UpdateEvolutionContainer(routeAction = routAction)
         }
         /** 리스트 화면 **/
         composable(
@@ -60,8 +81,8 @@ fun NavigationGraph() {
             arguments = listOf(
                 navArgument("group") { type = NavType.StringType }
             ),
-            enterTransition = { slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) },
-            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
         ) {
             PokemonListScreen(routeAction = routAction)
         }
@@ -106,6 +127,10 @@ fun NavigationGraph() {
 
 }
 
+fun getEnterTransition() = fadeIn() + slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+
+fun getExitTransition() = fadeOut() + slideOutVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+
 class RouteAction(private val navController: NavController) {
 
     fun navToList(group: String) {
@@ -144,6 +169,14 @@ class RouteAction(private val navController: NavController) {
         navController.navigate(AddEvolution)
     }
 
+    fun navToUpdateSearch() {
+        navController.navigate(UpdateSearch)
+    }
+
+    fun navToUpdateEvolution(index: String) {
+        navController.navigate("${UpdateEvolution}/$index")
+    }
+
     fun popupBackStack() {
         navController.popBackStack()
     }
@@ -153,6 +186,8 @@ class RouteAction(private val navController: NavController) {
         const val Detail = "detail"
         const val Add = "add"
         const val AddEvolution = "add_evolution"
+        const val UpdateEvolution = "update_evolution"
+        const val UpdateSearch = "update_search"
         const val List = "List"
     }
 

@@ -6,6 +6,7 @@
     <string name="generation">세대</string>
     <string name="add_pokemon">포켓몬\n등록</string>
     <string name="add_evolution">진화\n등록</string>
+    <string name="evolution_update">진화\n수정</string>
 
     <!-- 포켓몬 리스트 화면 -->
     <string name="search">포켓몬 검색</string>

@@ -1,9 +1,7 @@
 package com.example.pokemondex.view.add
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +9,10 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +26,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.pokemondex.R
 import com.example.pokemondex.network.data.EvolutionTemp
-import com.example.pokemondex.ui.theme.*
-import com.example.pokemondex.util.*
+import com.example.pokemondex.ui.theme.MainColor
+import com.example.pokemondex.ui.theme.Typography
+import com.example.pokemondex.ui.theme.White
+import com.example.pokemondex.util.getBlack
+import com.example.pokemondex.util.getWhite
+import com.example.pokemondex.util.nonRippleClickable
+import com.example.pokemondex.util.toast
 import com.example.pokemondex.view.dialog.RegisterResultDialog
 import com.example.pokemondex.view.navigation.RouteAction
 
@@ -320,7 +326,7 @@ fun TypeDropDownMenu(
     }
 }
 
-private fun readyLetters(type: String) =
+fun readyLetters(type: String) =
     when(type) {
         "이상한사탕" -> "Lv."
         "친밀도" -> "친밀도 0 이상 레벨업"

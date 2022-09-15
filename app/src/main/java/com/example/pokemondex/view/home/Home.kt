@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.MainColor
 import com.example.pokemondex.ui.theme.Typography
-import com.example.pokemondex.ui.theme.Yellow
 import com.example.pokemondex.util.Constants.generationList
 import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.getWhite
@@ -96,6 +95,32 @@ fun LazyListScope.homeBody(
             ) {
                 routeAction.navToAddEvolution()
             } // 진화 등록
+        } // Row
+    } // 포켓몬 등록, 진화 등록 버튼
+
+    item { Spacer(modifier = Modifier.height(10.dp)) }
+
+    /** 진화 수정 버튼 **/
+    item {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            /** 진화 수정 버튼 **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.evolution_update), R.drawable.img_update_evoluton),
+                modifier = Modifier.weight(1f)
+            ) {
+                routeAction.navToUpdateSearch()
+            } // 진화 수정 버튼
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            /** 진화 수정 버튼 **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.evolution_update), R.drawable.img_update_evoluton),
+                modifier = Modifier.weight(1f)
+            ) {
+                routeAction.navToUpdateSearch()
+            } // 진화 수정 버튼
+
         } // Row
     } // 포켓몬 등록, 진화 등록 버튼
 }

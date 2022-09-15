@@ -1,5 +1,7 @@
 package com.example.pokemondex.network.data
 
+import retrofit2.http.Body
+
 data class EvolutionResult(
     val beforeDot: String?= null,
     val beforeShinyDot: String?= null,
@@ -30,6 +32,7 @@ data class Evolution(
 )
 
 data class EvolutionTemp(
+    var index: Int = 0,
     var numbers: String = "",
     var beforeNum: String = "",
     var afterNum: String = "",
@@ -46,6 +49,7 @@ data class EvolutionTemp(
         }
 
         return EvolutionInfo(
+            index = index,
             numbers = numbers,
             beforeNum = beforeNum,
             afterNum = afterNum,
@@ -56,11 +60,41 @@ data class EvolutionTemp(
 }
 
 data class EvolutionInfo(
+    val index: Int = 0,
     val numbers: String,
     val beforeNum: String,
     val afterNum: String,
     val evolutionType: String,
     val evolutionConditions: String
+)
+
+data class UpdateEvolutionInfoResult(
+    val index: Int?,
+    val numbers: String?,
+    val beforeNum: String?,
+    val afterNum: String?,
+    val evolutionType: String?,
+    val evolutionConditions: String?,
+    val beforeImage: String?,
+    val afterImage: String?
+) {
+    fun mapper(): EvolutionTemp? {
+        return EvolutionTemp(
+            index = index ?: return null,
+            numbers = numbers ?: return null,
+            beforeNum = beforeNum ?: return null,
+            afterNum = afterNum ?: return null,
+            evolutionType = evolutionType ?: return null,
+            evolutionConditions = evolutionConditions ?: return null,
+            beforeImage = beforeImage ?: return null,
+            afterImage = afterImage ?: return null
+        )
+    }
+}
+
+data class EvolutionUpdateParam(
+    val items: List<EvolutionInfo>,
+    val removeItems: List<Int>
 )
 
 data class Name(

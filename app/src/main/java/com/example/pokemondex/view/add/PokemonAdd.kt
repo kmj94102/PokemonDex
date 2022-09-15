@@ -546,6 +546,8 @@ fun CustomTextFiled(
 fun CustomButton(
     value: String,
     modifier: Modifier = Modifier,
+    color: Color = Yellow,
+    textColor: Color = Black,
     clickListener: () -> Unit
 ) {
     Button(
@@ -553,13 +555,13 @@ fun CustomButton(
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(1.dp, MainColor),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Yellow
+            containerColor = color
         ),
         modifier = modifier
     ) {
         Text(
             text = value,
-            color = Black,
+            color = textColor,
             style = Typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxSize()
