@@ -14,6 +14,7 @@ import com.example.pokemondex.view.detail.DetailScreen
 import com.example.pokemondex.view.home.HomeScreen
 import com.example.pokemondex.view.list.PokemonListScreen
 import com.example.pokemondex.view.update.evolution.UpdateEvolutionContainer
+import com.example.pokemondex.view.update.pokemon.NewPokemonDexContainer
 import com.example.pokemondex.view.update.search.UpdateSearchContainer
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -58,11 +59,15 @@ fun NavigationGraph() {
         }
         /** 포켓몬 수정을 위한 검색 화면 **/
         composable(
-            route = RouteAction.UpdateSearch,
+            route = "${RouteAction.UpdateSearch}/{type}",
+            arguments = listOf(
+                navArgument(RouteAction.Type) { type = NavType.StringType }
+            ),
             enterTransition = { getEnterTransition() },
             exitTransition = { getExitTransition() }
-        ) {
-            UpdateSearchContainer(routeAction = routAction)
+        ) { scope ->
+            val type = scope.arguments?.getString(RouteAction.Type) ?: return@composable
+            UpdateSearchContainer(routeAction = routAction, type = type)
         }
         /** 포켓몬 진화 수정 화면 **/
         composable(
@@ -74,6 +79,17 @@ fun NavigationGraph() {
             exitTransition = { getExitTransition() }
         ) {
             UpdateEvolutionContainer(routeAction = routAction)
+        }
+        /** 신규 도감 등록 화면 **/
+        composable(
+            route = "${RouteAction.NewPokemonDex}/{index}",
+            arguments = listOf(
+                navArgument("index") { type = NavType.StringType }
+            ),
+            enterTransition = { getEnterTransition() },
+            exitTransition = { getExitTransition() }
+        ) {
+            NewPokemonDexContainer(routeAction = routAction)
         }
         /** 리스트 화면 **/
         composable(
@@ -169,12 +185,16 @@ class RouteAction(private val navController: NavController) {
         navController.navigate(AddEvolution)
     }
 
-    fun navToUpdateSearch() {
-        navController.navigate(UpdateSearch)
+    fun navToUpdateSearch(type: String) {
+        navController.navigate("$UpdateSearch/${type}")
     }
 
     fun navToUpdateEvolution(index: String) {
-        navController.navigate("${UpdateEvolution}/$index")
+        navController.navigate("$UpdateEvolution/$index")
+    }
+
+    fun navToNewPokemonDex(index: String) {
+        navController.navigate("$NewPokemonDex/$index")
     }
 
     fun popupBackStack() {
@@ -188,7 +208,9 @@ class RouteAction(private val navController: NavController) {
         const val AddEvolution = "add_evolution"
         const val UpdateEvolution = "update_evolution"
         const val UpdateSearch = "update_search"
+        const val NewPokemonDex = "new_pokemon_dex"
         const val List = "List"
+        const val Type = "type"
     }
 
 }

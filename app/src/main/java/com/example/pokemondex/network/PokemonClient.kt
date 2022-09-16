@@ -115,4 +115,15 @@ class PokemonClient @Inject constructor(
         e.printStackTrace()
         failureListener()
     }
+
+    suspend fun insertNewPokemonDex(
+        param: InsertNewDexParam,
+        successListener: (String) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.insertNewDex(param))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
 }

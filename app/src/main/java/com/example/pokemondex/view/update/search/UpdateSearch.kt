@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun UpdateSearchContainer(
     routeAction: RouteAction,
+    type: String,
     viewModel: UpdateSearchViewModel = hiltViewModel()
 ) {
 
@@ -57,7 +58,7 @@ fun UpdateSearchContainer(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        SearchResults(viewModel, routeAction)
+        SearchResults(viewModel, routeAction, type)
 
         when (stateFlow.value) {
             UpdateSearchViewModel.Event.Init -> {
@@ -206,7 +207,8 @@ fun SearchGuide() {
 @Composable
 fun SearchResults(
     viewModel: UpdateSearchViewModel,
-    routeAction: RouteAction
+    routeAction: RouteAction,
+    type: String
 ) {
     /** 포켓몬 리스트 **/
     LazyColumn(
@@ -223,7 +225,14 @@ fun SearchResults(
                 item = item,
                 isShiny = false,
                 clickListener = {
-                    routeAction.navToUpdateEvolution(it)
+                    when(type) {
+                        RouteAction.UpdateEvolution -> {
+                            routeAction.navToUpdateEvolution(it)
+                        }
+                        RouteAction.NewPokemonDex -> {
+                            routeAction.navToNewPokemonDex(it)
+                        }
+                    }
                 }
             )
         }

@@ -25,6 +25,7 @@ import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.getWhite
 import com.example.pokemondex.util.gridItems
 import com.example.pokemondex.view.navigation.RouteAction
+import com.example.pokemondex.view.navigation.RouteAction.Companion.UpdateEvolution
 
 @Composable
 fun HomeScreen(routeAction: RouteAction) {
@@ -108,17 +109,17 @@ fun LazyListScope.homeBody(
                 data = Pair(context.getString(R.string.evolution_update), R.drawable.img_update_evoluton),
                 modifier = Modifier.weight(1f)
             ) {
-                routeAction.navToUpdateSearch()
+                routeAction.navToUpdateSearch(RouteAction.UpdateEvolution)
             } // 진화 수정 버튼
 
             Spacer(modifier = Modifier.width(10.dp))
 
             /** 진화 수정 버튼 **/
             HomeCardButton(
-                data = Pair(context.getString(R.string.evolution_update), R.drawable.img_update_evoluton),
+                data = Pair(context.getString(R.string.new_pokemon_dex), R.drawable.img_update_evoluton),
                 modifier = Modifier.weight(1f)
             ) {
-                routeAction.navToUpdateSearch()
+                routeAction.navToUpdateSearch(RouteAction.NewPokemonDex)
             } // 진화 수정 버튼
 
         } // Row

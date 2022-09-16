@@ -35,4 +35,7 @@ interface PokemonService {
     @POST("/pokemon/evolution/update")
     suspend fun updateEvolution(@Body param: EvolutionUpdateParam): String
 
+    @POST("/newDex")
+    suspend fun insertNewDex(@Body param: InsertNewDexParam): String
+
 }

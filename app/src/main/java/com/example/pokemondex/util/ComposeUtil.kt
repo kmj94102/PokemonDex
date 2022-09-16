@@ -1,5 +1,6 @@
 package com.example.pokemondex.util
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,10 +13,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.*
+import com.example.pokemondex.view.navigation.RouteAction
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
@@ -119,5 +126,32 @@ fun CustomScrollableTabRow(
                 )
             }
         }
+    }
+}
+
+/** 상단 타이틀 **/
+@Composable
+fun Title(title: String, routeAction: RouteAction) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 17.dp, horizontal = 17.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_prev),
+            contentDescription = "prev",
+            colorFilter = ColorFilter.tint(getBlack()),
+            modifier = Modifier
+                .nonRippleClickable {
+                    routeAction.popupBackStack()
+                }
+        )
+        Text(
+            text = title,
+            style = Typography.titleLarge,
+            textAlign = TextAlign.Center,
+            color = MainColor,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }

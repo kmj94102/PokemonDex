@@ -564,7 +564,7 @@ fun CustomButton(
             color = textColor,
             style = Typography.bodyMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
