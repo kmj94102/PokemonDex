@@ -13,6 +13,7 @@ import com.example.pokemondex.view.add.PokemonAddContainer
 import com.example.pokemondex.view.detail.DetailScreen
 import com.example.pokemondex.view.home.HomeScreen
 import com.example.pokemondex.view.list.PokemonListScreen
+import com.example.pokemondex.view.new_dex.NewDexListScreen
 import com.example.pokemondex.view.update.evolution.UpdateEvolutionContainer
 import com.example.pokemondex.view.update.pokemon.NewPokemonDexContainer
 import com.example.pokemondex.view.update.search.UpdateSearchContainer
@@ -139,6 +140,15 @@ fun NavigationGraph() {
         ) {
             DetailScreen(routeAction = routAction)
         }
+        composable(
+            route = RouteAction.ArcusDex,
+            enterTransition = {
+                slideInHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+            },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            NewDexListScreen()
+        }
     }
 
 }
@@ -197,6 +207,10 @@ class RouteAction(private val navController: NavController) {
         navController.navigate("$NewPokemonDex/$index")
     }
 
+    fun navToArceusDex() {
+        navController.navigate(ArcusDex)
+    }
+
     fun popupBackStack() {
         navController.popBackStack()
     }
@@ -209,6 +223,7 @@ class RouteAction(private val navController: NavController) {
         const val UpdateEvolution = "update_evolution"
         const val UpdateSearch = "update_search"
         const val NewPokemonDex = "new_pokemon_dex"
+        const val ArcusDex = "arceus_dex"
         const val List = "List"
         const val Type = "type"
     }

@@ -24,6 +24,7 @@ import com.example.pokemondex.util.Constants.generationList
 import com.example.pokemondex.util.getBlack
 import com.example.pokemondex.util.getWhite
 import com.example.pokemondex.util.gridItems
+import com.example.pokemondex.util.toast
 import com.example.pokemondex.view.navigation.RouteAction
 import com.example.pokemondex.view.navigation.RouteAction.Companion.UpdateEvolution
 
@@ -101,7 +102,7 @@ fun LazyListScope.homeBody(
 
     item { Spacer(modifier = Modifier.height(10.dp)) }
 
-    /** 진화 수정 버튼 **/
+    /** 진화 수정 버튼, 신규 도감 등록 버튼 **/
     item {
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             /** 진화 수정 버튼 **/
@@ -114,7 +115,7 @@ fun LazyListScope.homeBody(
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            /** 진화 수정 버튼 **/
+            /** 신규 도감 등록 버튼 **/
             HomeCardButton(
                 data = Pair(context.getString(R.string.new_pokemon_dex), R.drawable.img_update_evoluton),
                 modifier = Modifier.weight(1f)
@@ -123,7 +124,30 @@ fun LazyListScope.homeBody(
             } // 진화 수정 버튼
 
         } // Row
-    } // 포켓몬 등록, 진화 등록 버튼
+    } // 진화 수정 버튼, 신규 도감 등록 버튼
+
+    item { Spacer(modifier = Modifier.height(10.dp)) }
+
+    /** 레전드 아르세우스, 9세대 도감 **/
+    item {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            /** 레전드 아르세우스 도감  **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.arceus_dex), R.drawable.img_arceus),
+                modifier = Modifier.weight(1f)
+            ) {
+                routeAction.navToArceusDex()
+            } // 레전드 아르세우스 도감
+
+            /** 9세대 도감  **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.arceus_dex), R.drawable.img_arceus),
+                modifier = Modifier.weight(1f)
+            ) {
+                context.toast("준비중입니다.")
+            } // 9세대 도감
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
