@@ -6,22 +6,28 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.*
+import com.example.pokemondex.view.list.ListEvent
+import com.example.pokemondex.view.list.ListViewModel
 import com.example.pokemondex.view.navigation.RouteAction
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -154,4 +160,61 @@ fun Title(title: String, routeAction: RouteAction) {
             modifier = Modifier.align(Alignment.Center)
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun SearchTextField(
+    value : String,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        shape = RoundedCornerShape(30.dp),
+        label = {
+            Text(text = stringResource(id = R.string.search), style = Typography.bodyMedium)
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            containerColor = getSkyBlue(),
+            cursorColor = getSkyBlue(),
+            textColor = getBlack(),
+            unfocusedLabelColor = Gray,
+            focusedLabelColor = Blue,
+            focusedBorderColor = Blue,
+            unfocusedBorderColor = Blue
+        ),
+        singleLine = true,
+        trailingIcon = {
+            Image(
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = "search",
+                colorFilter = ColorFilter.tint(getBlack()),
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onSearch()
+                        keyboardController?.hide()
+                    }
+            )
+        },
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearch()
+                keyboardController?.hide()
+            }
+        ),
+        modifier = modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth()
+    )
 }

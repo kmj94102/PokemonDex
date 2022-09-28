@@ -147,7 +147,7 @@ fun NavigationGraph() {
             },
             exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
         ) {
-            NewDexListScreen()
+            NewDexListScreen(routAction = routAction)
         }
     }
 
