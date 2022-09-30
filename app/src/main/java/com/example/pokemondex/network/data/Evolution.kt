@@ -1,5 +1,7 @@
 package com.example.pokemondex.network.data
 
+import com.example.pokemondex.database.EvolutionEntity
+import com.example.pokemondex.database.EvolutionTypeEntity
 import retrofit2.http.Body
 
 data class EvolutionResult(
@@ -66,7 +68,18 @@ data class EvolutionInfo(
     val afterNum: String,
     val evolutionType: String,
     val evolutionConditions: String
-)
+) {
+    fun mapper(): EvolutionEntity {
+        return EvolutionEntity(
+            index = 0,
+            numbers = numbers,
+            beforeNum = beforeNum,
+            afterNum = afterNum,
+            evolutionType = evolutionType,
+            evolutionConditions = evolutionConditions
+        )
+    }
+}
 
 data class UpdateEvolutionInfoResult(
     val index: Int?,
@@ -97,6 +110,15 @@ data class EvolutionUpdateParam(
     val removeItems: List<Int>
 )
 
-data class Name(
-    val name: String?= null
-)
+data class EvolutionType(
+    val name: String?= null,
+    val image: String?= null
+) {
+    fun mapper(): EvolutionTypeEntity? {
+        return EvolutionTypeEntity(
+            index = 0,
+            name = name ?: return null,
+            image = image ?: return null
+        )
+    }
+}

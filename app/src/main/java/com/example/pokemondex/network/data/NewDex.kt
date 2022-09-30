@@ -22,3 +22,8 @@ data class NewDexInfo(
         )
     }
 }
+
+data class NewDexSelectResult(
+    val lastIndex: String,
+    val info: List<Pokemon>
+)

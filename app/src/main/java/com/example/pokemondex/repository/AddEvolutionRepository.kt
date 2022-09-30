@@ -2,7 +2,6 @@ package com.example.pokemondex.repository
 
 import com.example.pokemondex.network.PokemonClient
 import com.example.pokemondex.network.data.EvolutionInfo
-import com.example.pokemondex.network.data.Name
 import com.example.pokemondex.network.data.PokemonListItem
 import javax.inject.Inject
 

@@ -92,7 +92,10 @@ fun LazyListScope.homeBody(
 
             /** 진화 등록 **/
             HomeCardButton(
-                data = Pair(context.getString(R.string.add_evolution), R.drawable.img_add_evolution),
+                data = Pair(
+                    context.getString(R.string.add_evolution),
+                    R.drawable.img_add_evolution
+                ),
                 modifier = Modifier.weight(1f)
             ) {
                 routeAction.navToAddEvolution()
@@ -107,7 +110,7 @@ fun LazyListScope.homeBody(
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             /** 진화 수정 버튼 **/
             HomeCardButton(
-                data = Pair(context.getString(R.string.evolution_update), R.drawable.img_update_evoluton),
+                data = Pair(context.getString(R.string.evolution_update), R.drawable.img_modify),
                 modifier = Modifier.weight(1f)
             ) {
                 routeAction.navToUpdateSearch(RouteAction.UpdateEvolution)
@@ -117,7 +120,10 @@ fun LazyListScope.homeBody(
 
             /** 신규 도감 등록 버튼 **/
             HomeCardButton(
-                data = Pair(context.getString(R.string.new_pokemon_dex), R.drawable.img_update_evoluton),
+                data = Pair(
+                    context.getString(R.string.new_pokemon_dex),
+                    R.drawable.img_update_evoluton
+                ),
                 modifier = Modifier.weight(1f)
             ) {
                 routeAction.navToUpdateSearch(RouteAction.NewPokemonDex)
@@ -134,18 +140,41 @@ fun LazyListScope.homeBody(
             /** 레전드 아르세우스 도감  **/
             HomeCardButton(
                 data = Pair(context.getString(R.string.arceus_dex), R.drawable.img_arceus),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Start
             ) {
                 routeAction.navToArceusDex()
             } // 레전드 아르세우스 도감
 
+            Spacer(modifier = Modifier.width(10.dp))
+
             /** 9세대 도감  **/
             HomeCardButton(
                 data = Pair(context.getString(R.string.arceus_dex), R.drawable.img_arceus),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Start
             ) {
                 context.toast("준비중입니다.")
             } // 9세대 도감
+        }
+    }
+
+    item { Spacer(modifier = Modifier.height(10.dp)) }
+
+    /** 다운로드 **/
+    item {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            /** 다운로드 **/
+            HomeCardButton(
+                data = Pair(context.getString(R.string.download), R.drawable.img_download),
+                modifier = Modifier.weight(1f)
+            ) {
+                routeAction.navToDownload()
+            } // 레전드 아르세우스 도감
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Box(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -155,6 +184,7 @@ fun LazyListScope.homeBody(
 fun HomeCardButton(
     data: Pair<String, Int>,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Center,
     clickListener: (String) -> Unit
 ) {
     Card(
@@ -187,7 +217,7 @@ fun HomeCardButton(
                 fontSize = 20.sp,
                 style = Typography.bodyLarge,
                 color = MainColor,
-                textAlign = TextAlign.Center,
+                textAlign = textAlign,
                 modifier = Modifier.padding(13.dp)
             )
         } // Box

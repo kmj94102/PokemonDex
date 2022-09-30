@@ -63,7 +63,7 @@ class PokemonClient @Inject constructor(
     }
 
     suspend fun selectEvolutionType(
-        successListener: (List<Name>) -> Unit,
+        successListener: (List<EvolutionType>) -> Unit,
         failureListener: () -> Unit
     ) = try {
         successListener(service.getEvolutionType())
@@ -126,4 +126,27 @@ class PokemonClient @Inject constructor(
         e.printStackTrace()
         failureListener()
     }
+
+    suspend fun selectNewDex(
+        param: SelectInfo,
+        successListener: (NewDexSelectResult) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.selectNewDex(param))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
+    suspend fun selectEvolutionIno(
+        param: SelectInfo,
+        successListener: (List<EvolutionInfo>) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(service.selectEvolutionIno(param))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        failureListener()
+    }
+
 }

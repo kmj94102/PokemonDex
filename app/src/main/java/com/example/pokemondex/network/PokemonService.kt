@@ -21,7 +21,7 @@ interface PokemonService {
     suspend fun insertCharacteristic(@Body characteristic: Characteristic): String
 
     @GET("/evolution/type")
-    suspend fun getEvolutionType(): List<Name>
+    suspend fun getEvolutionType(): List<EvolutionType>
 
     @POST("/evolutions")
     suspend fun insertEvolution(@Body evolutionInfoList: List<EvolutionInfo>): String
@@ -37,5 +37,11 @@ interface PokemonService {
 
     @POST("/newDex")
     suspend fun insertNewDex(@Body param: InsertNewDexParam): String
+
+    @POST("/newDex/select")
+    suspend fun selectNewDex(@Body param: SelectInfo): NewDexSelectResult
+
+    @POST("/evolutions/select")
+    suspend fun selectEvolutionIno(@Body param: SelectInfo): List<EvolutionInfo>
 
 }

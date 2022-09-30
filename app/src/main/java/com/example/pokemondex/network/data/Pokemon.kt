@@ -1,5 +1,7 @@
 package com.example.pokemondex.network.data
 
+import com.example.pokemondex.database.PokemonEntity
+
 data class PokemonResult(
     val info: Pokemon,
     val before: PokemonListItemTemp?,
@@ -43,7 +45,24 @@ data class Pokemon(
     var shinyImage: String?= null,
     var description: String?= null,
     var generation: Int?= null
-)
+) {
+    fun mapper(): PokemonEntity? {
+        return PokemonEntity(
+            number = number ?: return null,
+            name = name ?: return null,
+            status = status ?: return null,
+            classification = classification ?: return null,
+            characteristic = characteristic ?: return null,
+            attribute = attribute ?: return null,
+            dotImage = dotImage ?: return null,
+            dotShinyImage = dotShinyImage ?: return null,
+            image = image ?: return null,
+            shinyImage = shinyImage ?: return null,
+            description = description ?: return null,
+            generation = "arceus"
+        )
+    }
+}
 
 data class PokemonItem(
     val index: Long = 0L,
