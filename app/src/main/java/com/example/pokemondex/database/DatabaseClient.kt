@@ -50,4 +50,43 @@ class DatabaseClient @Inject constructor(
         failureListener()
     }
 
+    fun selectPokemonList(name: String) = dao.selectPokemonList(name)
+
+    fun selectNormalCollect() = dao.selectNormalCollect()
+
+    fun selectShinyCollect() = dao.selectShinyCollect()
+
+    suspend fun updateNormal(
+        number: String,
+        normal: Boolean,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(dao.updateNormal(number, normal))
+    } catch (e: Exception) {
+        failureListener()
+    }
+
+    suspend fun updateShiny(
+        number: String,
+        shiny: Boolean,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(dao.updateShiny(number, shiny))
+    } catch (e: Exception) {
+        failureListener()
+    }
+
+    suspend fun updateImportance(
+        number: String,
+        importance: Boolean,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) = try {
+        successListener(dao.updateImportance(number, importance))
+    } catch (e: Exception) {
+        failureListener()
+    }
+
 }

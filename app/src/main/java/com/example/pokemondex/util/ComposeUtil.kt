@@ -1,5 +1,10 @@
 package com.example.pokemondex.util
 
+import android.content.Context
+import android.os.Build
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,9 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -24,6 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.example.pokemondex.R
 import com.example.pokemondex.ui.theme.*
 import com.example.pokemondex.view.list.ListEvent
@@ -35,30 +41,42 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import kotlinx.coroutines.launch
 
 @Composable
-fun getWhite() : Color =
+fun getWhite(): Color =
     if (isSystemInDarkTheme()) Black else White
 
 @Composable
-fun getBlack() : Color =
+fun getBlack(): Color =
     if (isSystemInDarkTheme()) White else Black
 
 @Composable
-fun getGray() : Color =
+fun getGray(): Color =
     if (isSystemInDarkTheme()) LightGray else Gray
 
 @Composable
-fun getSkyBlue() : Color =
+fun getSkyBlue(): Color =
     if (isSystemInDarkTheme()) Black else SkyBlue
 
 @Composable
 fun Modifier.nonRippleClickable(
     onClick: () -> Unit
 ) = clickable(
-        indication = null,
-        interactionSource = remember { MutableInteractionSource() }
-    ) {
-        onClick()
-    }
+    indication = null,
+    interactionSource = remember { MutableInteractionSource() }
+) {
+    onClick()
+}
+
+@Composable
+fun getImageLoader(context: Context) =
+    ImageLoader.Builder(context)
+        .components {
+            if (Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
 
 // https://betterprogramming.pub/gridview-and-lazycolum-integration-with-jetpack-compose-e90849aeb6d3
 fun <T> LazyListScope.gridItems(
@@ -165,7 +183,7 @@ fun Title(title: String, routeAction: RouteAction) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchTextField(
-    value : String,
+    value: String,
     onValueChange: (String) -> Unit,
     onSearch: () -> Unit,
     modifier: Modifier = Modifier
@@ -217,4 +235,30 @@ fun SearchTextField(
             .padding(horizontal = 24.dp)
             .fillMaxWidth()
     )
+}
+
+// 자료 출처 : valueof.io/blog/intercept-back-press-button-in-jetpack-compose
+@Composable
+fun BackPressHandler(
+    backPressedDispatcher: OnBackPressedDispatcher? =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher,
+    onBackPressed: () -> Unit
+) {
+    val currentOnBackPressed by rememberUpdatedState(newValue = onBackPressed)
+
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                currentOnBackPressed()
+            }
+        }
+    }
+
+    DisposableEffect(key1 = backPressedDispatcher) {
+        backPressedDispatcher?.addCallback(backCallback)
+
+        onDispose {
+            backCallback.remove()
+        }
+    }
 }

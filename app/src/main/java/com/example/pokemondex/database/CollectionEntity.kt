@@ -12,3 +12,13 @@ data class CollectionEntity(
     @ColumnInfo(name = "shiny") val shiny: Boolean,
     @ColumnInfo(name = "importance") val importance: Boolean
 )
+
+data class CollectionPokemon(
+    val index: Long,
+    val number: String,
+    val name: String,
+    val dotImage: String,
+    val normal: Boolean,
+    val shiny: Boolean,
+    val importance: Boolean
+)
