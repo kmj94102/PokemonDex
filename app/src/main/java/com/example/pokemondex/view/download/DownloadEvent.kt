@@ -9,4 +9,5 @@ sealed class DownloadEvent {
         val startIndex: String,
         val endIndex: String
     ) : DownloadEvent()
+    object EvolutionTypeInsert: DownloadEvent()
 }

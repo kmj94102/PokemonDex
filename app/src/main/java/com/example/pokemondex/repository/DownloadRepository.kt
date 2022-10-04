@@ -88,9 +88,14 @@ class DownloadRepository @Inject constructor(
             },
             failureListener = failureListener
         )
+        insertEvolutionList(
+            param = list,
+            successListener = successListener,
+            failureListener = failureListener
+        )
     }
 
-    suspend fun insertEvolutionList(
+    private suspend fun insertEvolutionList(
         param: List<EvolutionEntity>,
         successListener: (Unit) -> Unit,
         failureListener: () -> Unit
@@ -103,13 +108,32 @@ class DownloadRepository @Inject constructor(
     }
 
     suspend fun selectEvolutionType(
-        successListener: (List<EvolutionTypeEntity>) -> Unit,
+        successListener: (Unit) -> Unit,
         failureListener: () -> Unit
     ) {
+        var list: List<EvolutionTypeEntity> = listOf()
         client.selectEvolutionType(
             successListener = {
-                successListener(it.mapNotNull { type -> type.mapper() })
+                list = it.mapNotNull { type -> type.mapper() }
             },
+            failureListener = failureListener
+        )
+
+        insertEvolutionType(
+            list = list,
+            successListener = successListener,
+            failureListener = failureListener
+        )
+    }
+
+    private suspend fun insertEvolutionType(
+        list: List<EvolutionTypeEntity>,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) {
+        databaseClient.insertEvolutionType(
+            evolutionTypeEntities = list,
+            successListener = successListener,
             failureListener = failureListener
         )
     }

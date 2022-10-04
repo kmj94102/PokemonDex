@@ -75,11 +75,12 @@ fun DownloadBody(viewModel: DownloadViewModel) {
         }
 
         CustomButton(value = "진화 추가") {
-            group = Constants.Pokemon
+            group = Constants.Evolution
             isShow.value = true
         }
 
         CustomButton(value = "진화 타입") {
+            viewModel.event(DownloadEvent.EvolutionTypeInsert)
         }
 
     }

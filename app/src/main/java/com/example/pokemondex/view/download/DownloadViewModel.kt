@@ -1,7 +1,5 @@
 package com.example.pokemondex.view.download
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokemondex.network.data.SelectInfo
@@ -27,6 +25,9 @@ class DownloadViewModel @Inject constructor(
             }
             is DownloadEvent.EvolutionInsert -> {
                 insertEvolutionInfo(event)
+            }
+            is DownloadEvent.EvolutionTypeInsert -> {
+                insertEvolutionTypeInfo()
             }
         }
     }
@@ -66,6 +67,19 @@ class DownloadViewModel @Inject constructor(
                 }
             )
         }
+
+    private fun insertEvolutionTypeInfo() = viewModelScope.launch {
+        _eventFlow.value = Event.Loading
+
+        repository.selectEvolutionType(
+            successListener = {
+                _eventFlow.value = Event.Success
+            },
+            failureListener = {
+                _eventFlow.value = Event.Error
+            }
+        )
+    }
 
     sealed class Event {
         object Init : Event()
