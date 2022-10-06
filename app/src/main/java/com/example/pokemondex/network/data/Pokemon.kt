@@ -34,6 +34,7 @@ data class PokemonResult(
 data class Pokemon(
     var index: Long?= null,
     var number: String?= null,
+    var allDexNumber: String?= null,
     var name: String?= null,
     var status: String?= null,
     var classification: String?= null,
@@ -49,6 +50,7 @@ data class Pokemon(
     fun mapper(): PokemonEntity? {
         return PokemonEntity(
             number = number ?: return null,
+            allDexNumber = allDexNumber ?: return null,
             name = name ?: return null,
             status = status ?: return null,
             classification = classification ?: return null,

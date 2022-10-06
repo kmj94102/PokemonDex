@@ -13,6 +13,7 @@ import com.example.pokemondex.view.download.DownloadScreen
 import com.example.pokemondex.view.home.HomeScreen
 import com.example.pokemondex.view.list.PokemonListScreen
 import com.example.pokemondex.view.new_dex.NewDexListScreen
+import com.example.pokemondex.view.new_dex.detail.NewDetailScreen
 import com.example.pokemondex.view.update.evolution.UpdateEvolutionContainer
 import com.example.pokemondex.view.update.pokemon.NewPokemonDexContainer
 import com.example.pokemondex.view.update.search.UpdateSearchContainer
@@ -125,10 +126,42 @@ fun NavigationGraph() {
         ) {
             DetailScreen(routeAction = routAction)
         }
+        /** 아르세우스 도감 **/
         customComposable(
             route = RouteAction.ArcusDex,
         ) {
             NewDexListScreen(routAction = routAction)
+        }
+        /** 아르세우스 도감 상세 **/
+        composable(
+            route = "${RouteAction.ArcusDetail}/{number}/{allDexNumber}",
+            arguments = listOf(
+                navArgument("number") { type = NavType.LongType },
+                navArgument("allDexNumber") { type = NavType.StringType },
+            ),
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 1000 },
+                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
+                )
+            },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            NewDetailScreen(routeAction = routAction)
+        }
+        /** 아르세우스 도감 상세 : 이전 버튼 **/
+        composable(
+            route = "${RouteAction.ArcusDetail}/before/{number}/{allDexNumber}",
+            arguments = listOf(
+                navArgument("number") { type = NavType.LongType },
+                navArgument("allDexNumber") { type = NavType.StringType },
+            ),
+            enterTransition = {
+                slideInHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+            },
+            exitTransition = { fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) }
+        ) {
+            NewDetailScreen(routeAction = routAction)
         }
         customComposable(
             route = RouteAction.Download
@@ -199,6 +232,24 @@ class RouteAction(private val navController: NavController) {
         navController.navigate(ArcusDex)
     }
 
+    fun navToArceusDetail(
+        number: Long,
+        allDexNumber: String,
+        needPopupBackStack: Boolean = false
+    ) {
+        navController.navigate("$ArcusDetail/$number/$allDexNumber") {
+            if (needPopupBackStack) {
+                popupBackStack()
+            }
+        }
+    }
+
+    fun navToArceusDetailBefore(number: Long, allDexNumber: String) {
+        navController.navigate("$ArcusDetail/before/$number/$allDexNumber") {
+            popupBackStack()
+        }
+    }
+
     fun navToDownload() {
         navController.navigate(Download)
     }
@@ -216,6 +267,7 @@ class RouteAction(private val navController: NavController) {
         const val UpdateSearch = "update_search"
         const val NewPokemonDex = "new_pokemon_dex"
         const val ArcusDex = "arceus_dex"
+        const val ArcusDetail = "arceus_dex_detail"
         const val Download = "download"
         const val List = "List"
         const val Type = "type"

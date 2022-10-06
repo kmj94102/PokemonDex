@@ -4,7 +4,7 @@ import com.example.pokemondex.R
 
 object Constants {
 
-    const val BaseUrl = "http://4ab9-121-164-144-250.ngrok.io" //"http://10.0.2.2:8000/"
+    const val BaseUrl = "http://d4ec-121-164-144-250.ngrok.io" //"http://10.0.2.2:8000/"
     const val ExternalUrl = "https://pokeapi.co/api/"
     const val Pokemon = "pokemon"
     const val Evolution = "evolution"

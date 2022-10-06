@@ -39,7 +39,7 @@ class NewDexViewModel @Inject constructor(
 
     private fun insertNewPokemonDex(event: NewDexEvent.Complete) = viewModelScope.launch {
         repository.insertNewPokemonDex(
-            param = _info.value,
+            param = _info.value.copy(number = _info.value.number.padStart(3, '0')),
             successListener = {
                 event.successListener(it)
             },

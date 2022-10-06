@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class PokemonEntity(
     @PrimaryKey(autoGenerate = true) val index: Long = 0,
     @ColumnInfo(name = "number") val number: String,
+    @ColumnInfo(name = "allDexNumber") val allDexNumber: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "status") val status: String,
     @ColumnInfo(name = "classification") val classification: String,

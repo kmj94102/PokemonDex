@@ -56,6 +56,37 @@ class DatabaseClient @Inject constructor(
 
     fun selectShinyCollect() = dao.selectShinyCollect()
 
+    suspend fun selectButtonInfo(
+        number: Long,
+    ): PokemonButtonInfo? {
+        return try {
+            dao.selectBriefInformation(number)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun selectPokemonInfo(number: String) = dao.selectPokemonInfo(allDexNumber = number)
+
+    suspend fun selectEvolutionInfo(
+        allDexNumber: String,
+    ): List<EvolutionInfo?> = try {
+        dao.selectEvolutionInfo(allDexNumber = allDexNumber)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        listOf()
+    }
+
+    suspend fun selectPokemonImage(
+        allDexNumber: String,
+    ): EvolutionImage? = try {
+        dao.selectPokemonImage(allDexNumber = allDexNumber)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
     suspend fun updateNormal(
         number: String,
         normal: Boolean,

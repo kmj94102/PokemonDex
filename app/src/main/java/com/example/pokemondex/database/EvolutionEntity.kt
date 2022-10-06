@@ -13,3 +13,16 @@ data class EvolutionEntity(
     @ColumnInfo(name = "evolutionType") val evolutionType: String,
     @ColumnInfo(name = "evolutionConditions") val evolutionConditions: String
 )
+
+data class EvolutionInfo(
+    val afterNum: String,
+    val beforeNum: String,
+    val evolutionType: String,
+    val evolutionConditions: String,
+    val image: String,
+)
+
+data class EvolutionImage(
+    val image: String,
+    val shinyImage: String,
+)

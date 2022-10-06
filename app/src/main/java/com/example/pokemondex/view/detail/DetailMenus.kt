@@ -348,7 +348,7 @@ fun EvolutionContainer(
 @Composable
 fun EvolutionRow(
     evolutionInfo: Evolution,
-    isShiny: Boolean
+    isShiny: Boolean = false
 ) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)

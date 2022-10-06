@@ -60,6 +60,7 @@ fun NewDexListScreen(
             lazyListSate = lazyListSate,
             list = viewModel.pokemonList.value,
             viewModel = viewModel,
+            routAction = routAction,
             modifier = Modifier.weight(1f)
         )
 
@@ -127,6 +128,7 @@ fun NewDexBody(
     lazyListSate: LazyListState,
     list: List<CollectionPokemon>,
     viewModel: NewDexViewModel,
+    routAction: RouteAction,
     modifier: Modifier = Modifier
 ) {
 
@@ -137,13 +139,19 @@ fun NewDexBody(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.padding(horizontal = 24.dp)
         ) { item, _ ->
-            NewDexListItem(item, viewModel)
+            NewDexListItem(item, viewModel) {
+                routAction.navToArceusDetail(item.index, item.allDexNumber)
+            }
         }
     }
 }
 
 @Composable
-fun NewDexListItem(pokemon: CollectionPokemon, viewModel: NewDexViewModel) {
+fun NewDexListItem(
+    pokemon: CollectionPokemon,
+    viewModel: NewDexViewModel,
+    onClick: () -> Unit
+) {
     val context = LocalContext.current
     val imageLoader = getImageLoader(context)
 
@@ -158,7 +166,10 @@ fun NewDexListItem(pokemon: CollectionPokemon, viewModel: NewDexViewModel) {
             containerColor = getSkyBlue()
         ),
         border = BorderStroke(1.dp, Blue),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(10.dp),
+        modifier = Modifier.clickable {
+            onClick()
+        }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
 
@@ -304,7 +315,7 @@ fun NewDexFooter(viewModel: NewDexViewModel, isOpen: MutableState<Boolean>) {
     val radioItems = listOf("전체", "미포획", "즐겨찾기")
     val isSelectedItem: (String) -> Boolean = { radioSelected.value == it }
     val onSelectedChange: (String) -> Unit = {
-        when(it) {
+        when (it) {
             radioItems[0] -> viewModel.event(NewDexEvent.SelectInfo(NewDexViewModel.All))
             radioItems[1] -> viewModel.event(NewDexEvent.SelectInfo(NewDexViewModel.NonCollection))
             radioItems[2] -> viewModel.event(NewDexEvent.SelectInfo(NewDexViewModel.Importance))

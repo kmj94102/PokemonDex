@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -508,6 +509,7 @@ fun CustomTextFiled(
     isEnabled: Boolean = true,
     inputType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
+    keyboardActions: KeyboardActions = KeyboardActions(),
     changeListener: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -536,6 +538,7 @@ fun CustomTextFiled(
             keyboardType = inputType,
             imeAction = imeAction
         ),
+        keyboardActions = keyboardActions,
         shape = RoundedCornerShape(10.dp),
         singleLine = true,
         modifier = modifier

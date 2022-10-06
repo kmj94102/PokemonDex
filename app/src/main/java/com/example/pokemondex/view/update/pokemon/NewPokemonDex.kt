@@ -1,6 +1,7 @@
 package com.example.pokemondex.view.update.pokemon
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +23,17 @@ fun NewPokemonDexContainer(
 
     val info = viewModel.info.value
     val context = LocalContext.current
+    val insertDex: () -> Unit = {
+        viewModel.event(NewDexEvent.Complete(
+            successListener = {
+                context.toast("등록이 완료되었습니다.")
+                routeAction.popupBackStack()
+            },
+            failureListener = {
+                context.toast("등록 실패.")
+            }
+        ))
+    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         /** 상단 타이틀 **/
@@ -30,11 +42,16 @@ fun NewPokemonDexContainer(
         CustomTextFiled(
             value = info.number,
             hint = "도감 번호",
-            inputType = KeyboardType.Text,
+            inputType = KeyboardType.Number,
             imeAction = ImeAction.Done,
             changeListener = {
                 viewModel.event(NewDexEvent.DexNumber(it))
             },
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    insertDex()
+                }
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
@@ -48,15 +65,7 @@ fun NewPokemonDexContainer(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
         ) {
-            viewModel.event(NewDexEvent.Complete(
-                successListener = {
-                    context.toast("등록이 완료되었습니다.")
-                    routeAction.popupBackStack()
-                },
-                failureListener = {
-                    context.toast("등록 실패.")
-                }
-            ))
+            insertDex()
         }
 
     }
