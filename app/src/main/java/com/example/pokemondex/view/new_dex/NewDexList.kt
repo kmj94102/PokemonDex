@@ -50,23 +50,25 @@ fun NewDexListScreen(
     val isOpen = remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        /** 헤더 영역 : 로고, 일반 이로치 잡은 카운트 표시 **/
         NewDexHeader(
             lazyListSate = lazyListSate,
             normalCollect = viewModel.normalCollect.value,
             shinyCollect = viewModel.shinyCollect.value,
             allCollect = viewModel.pokemonList.value.size
         )
+        /** 바디 영역 : 포켓몬 리스트 **/
         NewDexBody(
             lazyListSate = lazyListSate,
-            list = viewModel.pokemonList.value,
             viewModel = viewModel,
             routAction = routAction,
             modifier = Modifier.weight(1f)
         )
-
+        /** 풋터 영역 : 검색 영역 **/
         NewDexFooter(viewModel, isOpen)
-
+        /** 뒤로가기 핸들러 **/
         BackPressHandler {
+            // 하단 메뉴가 열려 있을시 하단 메뉴 내리기
             if (isOpen.value) {
                 isOpen.value = false
             } else {
@@ -76,6 +78,9 @@ fun NewDexListScreen(
     }
 }
 
+/**
+ * 헤더 영역 : 로고, 일반 이로치 잡은 카운트 표시
+ * **/
 @Composable
 fun NewDexHeader(
     lazyListSate: LazyListState,
@@ -91,6 +96,7 @@ fun NewDexHeader(
             .fillMaxWidth()
             .padding(vertical = 15.dp)
     ) {
+        // 로고 이미지 : 스크롤 내릴 시 0 최상단 시 172Dp
         Image(
             painter = painterResource(id = R.drawable.img_arceus_logo),
             contentDescription = "logo",
@@ -99,6 +105,7 @@ fun NewDexHeader(
                 .align(Alignment.CenterHorizontally)
         )
 
+        // 포켓몬 잡은 카운트 표시
         Row(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -123,15 +130,15 @@ fun NewDexHeader(
     }
 }
 
+/** 포켓몬 리스트 **/
 @Composable
 fun NewDexBody(
     lazyListSate: LazyListState,
-    list: List<CollectionPokemon>,
     viewModel: NewDexViewModel,
     routAction: RouteAction,
     modifier: Modifier = Modifier
 ) {
-
+    val list = viewModel.pokemonList.value
     LazyColumn(state = lazyListSate, modifier = modifier) {
         gridItems(
             data = list,
@@ -143,9 +150,30 @@ fun NewDexBody(
                 routAction.navToArceusDetail(item.index, item.allDexNumber)
             }
         }
+        if (list.isEmpty()) {
+            item {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = modifier.fillMaxSize()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.img_empty4),
+                        contentDescription = "empty"
+                    )
+                    Text(
+                        text = "검색 결과 정보가 없습니다.",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = getBlack()
+                    )
+                }
+            }
+        }
     }
 }
 
+/** 포켓몬 리스트 아이템 **/
 @Composable
 fun NewDexListItem(
     pokemon: CollectionPokemon,
@@ -273,6 +301,10 @@ fun NewDexListItem(
     }
 }
 
+/**
+ * 스크롤 텍스트 아이템
+ * 영역보다 텍스트가 길어지면 글씨 스크롤 됨
+ * **/
 @Composable
 fun ScrolledText(
     text: String,
@@ -305,6 +337,9 @@ fun ScrolledText(
     )
 }
 
+/**
+ * 검색 영역
+ * **/
 @Composable
 fun NewDexFooter(viewModel: NewDexViewModel, isOpen: MutableState<Boolean>) {
     val radioSelected = remember { mutableStateOf("전체") }

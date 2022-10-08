@@ -1,9 +1,12 @@
 package com.example.pokemondex.view.new_dex.detail
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -13,7 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -41,6 +48,7 @@ import com.example.pokemondex.view.detail.CustomProgressBar
 import com.example.pokemondex.view.detail.EvolutionRow
 import com.example.pokemondex.view.navigation.RouteAction
 import com.google.accompanist.flowlayout.FlowRow
+import kotlinx.coroutines.launch
 
 @Composable
 fun NewDetailScreen(
@@ -55,12 +63,15 @@ fun NewDetailScreen(
             .fillMaxSize()
             .background(Color(getTypeColor(type)))
     ) {
+        /** 헤더 영역 : 번호, 이전/다음 포켓몬, 포켓몬 이름/타입/이미지 **/
         NewDetailHeader(routeAction, viewModel)
+        /** 바디 영역 : 포켓몬 정보 **/
         NewDetailBody(viewModel.pokemonInfo.value, viewModel.evolutionInfo)
     }
 
 }
 
+/** 헤더 영역 : 번호, 이전/다음 포켓몬, 포켓몬 이름/타입/이미지 **/
 @Composable
 fun NewDetailHeader(
     routeAction: RouteAction,
@@ -70,6 +81,7 @@ fun NewDetailHeader(
         modifier = Modifier
             .fillMaxWidth()
     ) {
+        /** 타이틀 영역 : 번호, 이전/다음 포켓몬 **/
         NewDetailTitle(
             beforeInfo = viewModel.beforeButtonInfo.value,
             afterInfo = viewModel.afterButtonInfo.value,
@@ -79,13 +91,16 @@ fun NewDetailHeader(
                 .fillMaxWidth()
                 .background(White)
         )
+        /** 포켓몬 정보 : 포켓몬 이름/타입/이미지 **/
         PokemonInfo(
             pokemonInfo = viewModel.pokemonInfo.value,
+            viewModel = viewModel,
             modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
+/** 타이틀 영역 : 번호, 이전/다음 포켓몬 **/
 @Composable
 fun NewDetailTitle(
     beforeInfo: PokemonButtonInfo?,
@@ -167,11 +182,20 @@ fun NewDetailTitle(
     } // 상단 타이틀
 }
 
+/** 포켓몬 정보 : 포켓몬 이름/타입/이미지 **/
 @Composable
 fun PokemonInfo(
     pokemonInfo: CollectionPokemonDetail,
+    viewModel: NewDetailViewModel,
     modifier: Modifier = Modifier
 ) {
+    val normalState by animateColorAsState(
+        targetValue = if (pokemonInfo.normal) Color(0x0) else Color(0xBF000000)
+    )
+    val shinyState by animateColorAsState(
+        targetValue = if (pokemonInfo.shiny) Color(0x0) else Color(0xBF000000)
+    )
+
     ConstraintLayout(
         modifier = modifier
             .clip(
@@ -214,10 +238,14 @@ fun PokemonInfo(
                 id = if (pokemonInfo.importance) R.drawable.ic_star_fill else R.drawable.ic_star
             ),
             contentDescription = "importance",
-            modifier = Modifier.constrainAs(importance) {
-                top.linkTo(name.top)
-                end.linkTo(parent.end, 20.dp)
-            }
+            modifier = Modifier
+                .nonRippleClickable {
+                    viewModel.event(NewDetailEvent.UpdateImportanceState)
+                }
+                .constrainAs(importance) {
+                    top.linkTo(name.top)
+                    end.linkTo(parent.end, 20.dp)
+                }
         )
 
         AsyncImage(
@@ -226,12 +254,15 @@ fun PokemonInfo(
             error = painterResource(id = R.drawable.img_monsterbal),
             placeholder = painterResource(id = R.drawable.img_monsterbal),
             modifier = Modifier
+                .nonRippleClickable {
+                    viewModel.event(NewDetailEvent.UpdateNormalState)
+                }
                 .graphicsLayer(alpha = 0.99f)
                 .drawWithCache {
                     onDrawWithContent {
                         drawContent()
                         drawRect(
-                            Color(if (pokemonInfo.normal) 0x0 else 0xBF000000),
+                            normalState,
                             blendMode = BlendMode.SrcAtop
                         )
                     }
@@ -251,12 +282,15 @@ fun PokemonInfo(
             error = painterResource(id = R.drawable.img_monsterbal),
             placeholder = painterResource(id = R.drawable.img_monsterbal),
             modifier = Modifier
+                .nonRippleClickable {
+                    viewModel.event(NewDetailEvent.UpdateShinyState)
+                }
                 .graphicsLayer(alpha = 0.99f)
                 .drawWithCache {
                     onDrawWithContent {
                         drawContent()
                         drawRect(
-                            Color(if (pokemonInfo.shiny) 0x0 else 0xBF000000),
+                            shinyState,
                             blendMode = BlendMode.SrcAtop
                         )
                     }
@@ -273,19 +307,44 @@ fun PokemonInfo(
     }
 }
 
+/** 바디 영역 : 포켓몬 정보 **/
 @Composable
 fun NewDetailBody(pokemonInfo: CollectionPokemonDetail, evolution: List<Evolution>) {
     var selectIndex by remember { mutableStateOf(0) }
+    val itemsListState = rememberLazyListState()
+    val sectionsListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxWidth()) {
+        /** 텝 영역 **/
         NewDetailTab(selectIndex) {
             selectIndex = it
+
+            scope.launch {
+                itemsListState.animateScrollToItem(it)
+            }
         }
-        PokemonProfile(pokemonInfo, evolution)
+
+        /** 포켓몬 정보 : 프로필/스테이터스/진화/상성 **/
+        PokemonProfile(
+            pokemonInfo,
+            evolution,
+            itemsListState
+        ) {
+            val currentSectionIndex = itemsListState.firstVisibleItemIndex
+            if (selectIndex != currentSectionIndex) {
+                selectIndex = currentSectionIndex
+
+                scope.launch {
+                    sectionsListState.animateScrollToItem(currentSectionIndex)
+                }
+            }
+        }
     }
 
 }
 
+/** 텝 영역 **/
 @Composable
 fun NewDetailTab(selectIndex: Int, onClick: (Int) -> Unit) {
     val list = listOf("프로필", "스테이터스", "진화", "상성")
@@ -316,8 +375,14 @@ fun NewDetailTab(selectIndex: Int, onClick: (Int) -> Unit) {
 
 }
 
+/** 포켓몬 정보 : 프로필/스테이터스/진화/상성 **/
 @Composable
-fun PokemonProfile(pokemonInfo: CollectionPokemonDetail, evolution: List<Evolution>) {
+fun PokemonProfile(
+    pokemonInfo: CollectionPokemonDetail,
+    evolution: List<Evolution>,
+    state: LazyListState,
+    onPostScroll: () -> Unit
+) {
     val titleStyle = TextStyle(
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
@@ -332,25 +397,34 @@ fun PokemonProfile(pokemonInfo: CollectionPokemonDetail, evolution: List<Evoluti
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(15.dp),
         contentPadding = PaddingValues(top = 15.dp, bottom = 30.dp, start = 20.dp, end = 20.dp),
-        modifier = Modifier.fillMaxWidth()
+        state = state,
+        modifier = Modifier
+            .fillMaxWidth()
+            .nestedScroll(object : NestedScrollConnection {
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    onPostScroll()
+                    return super.onPostScroll(consumed, available, source)
+                }
+            })
     ) {
         item {
             Text(text = "프로필", style = titleStyle)
-        }
+            Spacer(modifier = Modifier.height(15.dp))
 
-        item {
             Text(text = "설명", style = contentStyle, fontWeight = FontWeight.Bold, color = MainColor)
             Spacer(modifier = Modifier.height(5.dp))
             Text(text = pokemonInfo.description, style = contentStyle)
-        }
+            Spacer(modifier = Modifier.height(15.dp))
 
-        item {
             Text(text = "분류", style = contentStyle, fontWeight = FontWeight.Bold, color = MainColor)
             Spacer(modifier = Modifier.height(5.dp))
             Text(text = pokemonInfo.classification, style = contentStyle)
-        }
+            Spacer(modifier = Modifier.height(15.dp))
 
-        item {
             Text(text = "특성", style = contentStyle, fontWeight = FontWeight.Bold, color = MainColor)
             Spacer(modifier = Modifier.height(5.dp))
             Text(text = pokemonInfo.characteristic, style = contentStyle)
@@ -358,7 +432,7 @@ fun PokemonProfile(pokemonInfo: CollectionPokemonDetail, evolution: List<Evoluti
 
         item {
             Text(text = "스테이터스", style = titleStyle)
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             val list = StatusInfo.values()
             pokemonInfo.status.split(",").forEachIndexed { index, attribute ->
@@ -387,6 +461,7 @@ fun PokemonProfile(pokemonInfo: CollectionPokemonDetail, evolution: List<Evoluti
     }
 }
 
+/** 진화 정보 **/
 @Composable
 fun EvolutionContainer(list: List<Evolution>) {
     list.forEach {
@@ -419,7 +494,7 @@ fun EvolutionContainer(list: List<Evolution>) {
     }
 }
 
-
+/** 포켓몬 상성 정보 **/
 @Composable
 fun TypeCompatibilityContainer(
     list: List<Pair<Float, String>>
@@ -464,6 +539,7 @@ fun TypeCompatibilityContainer(
     }
 }
 
+/** 포켓몬 상성 아이템 **/
 @Composable
 fun DamageItems(
     text: String,
@@ -487,5 +563,4 @@ fun DamageItems(
             )
         }
     }
-
 }

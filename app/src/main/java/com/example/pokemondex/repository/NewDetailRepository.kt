@@ -58,4 +58,46 @@ class NewDetailRepository @Inject constructor(
 
     fun selectPokemonInfo(number: String) = client.selectPokemonInfo(number)
 
+    suspend fun updateNormal(
+        number: String,
+        normal: Boolean,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) {
+        client.updateNormal(
+            number = number,
+            normal = normal,
+            successListener = successListener,
+            failureListener = failureListener
+        )
+    }
+
+    suspend fun updateShiny(
+        number: String,
+        shiny: Boolean,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) {
+        client.updateShiny(
+            number = number,
+            shiny = shiny,
+            successListener = successListener,
+            failureListener = failureListener
+        )
+    }
+
+    suspend fun updateImportance(
+        number: String,
+        importance: Boolean,
+        successListener: (Unit) -> Unit,
+        failureListener: () -> Unit
+    ) {
+        client.updateImportance(
+            number = number,
+            importance = importance,
+            successListener = successListener,
+            failureListener = failureListener
+        )
+    }
+
 }

@@ -69,7 +69,11 @@ class NewDexViewModel @Inject constructor(
                     else -> it
                 }
             }
-            .onEach { _pokemonList.value = it }
+            .onEach {
+                _pokemonList.value = it
+                _normalCollect.value = it.filter { pokemon -> pokemon.normal }.size
+                _shinyCollect.value = it.filter { pokemon -> pokemon.shiny }.size
+            }
             .catch { _pokemonList.value = emptyList() }
             .launchIn(viewModelScope)
     }

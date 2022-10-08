@@ -46,8 +46,6 @@ class NewDetailViewModel @Inject constructor(
                     }
                 )
             }
-
-
         }
 
         savedStateHandle.get<String>("allDexNumber")?.let { number ->
@@ -65,6 +63,47 @@ class NewDetailViewModel @Inject constructor(
                 }
                 .launchIn(viewModelScope)
         }
+    }
+
+    fun event(event: NewDetailEvent) {
+        when(event) {
+            is NewDetailEvent.UpdateNormalState -> {
+                updateNormal()
+            }
+            is NewDetailEvent.UpdateShinyState -> {
+                updateShiny()
+            }
+            is NewDetailEvent.UpdateImportanceState -> {
+                updateImportance()
+            }
+        }
+    }
+
+    private fun updateNormal() = viewModelScope.launch {
+        repository.updateNormal(
+            number = _pokemonInfo.value.number,
+            normal = _pokemonInfo.value.normal.not(),
+            successListener = { },
+            failureListener = { }
+        )
+    }
+
+    private fun updateShiny() = viewModelScope.launch {
+        repository.updateShiny(
+            number = _pokemonInfo.value.number,
+            shiny = _pokemonInfo.value.shiny.not(),
+            successListener = { },
+            failureListener = { }
+        )
+    }
+
+    private fun updateImportance() = viewModelScope.launch {
+        repository.updateImportance(
+            number = _pokemonInfo.value.number,
+            importance = _pokemonInfo.value.importance.not(),
+            successListener = { },
+            failureListener = { }
+        )
     }
 
 }
